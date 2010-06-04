@@ -1,8 +1,8 @@
 #----------------------------------------------------------------------------
-# vbfilter.awk - doxygen VB .NET filter script
+# vbfilter.awk - doxygen VB .NET filter script - v1.1
 #
 # Creation:     26.05.2010  Vsevolod Kukol
-# Last Update:  03.06.2010  Vsevolod Kukol
+# Last Update:  05.06.2010  Vsevolod Kukol
 #
 # Copyright (c) 2010 Vsevolod Kukol, sevo(at)sevo(dot)org
 #
@@ -62,7 +62,6 @@ BEGIN{
 	insideImports=0;
 	isInherited=0;
 	lastLine="";
-	EnumSep="";
 	appShift="";
 }
 
@@ -215,12 +214,15 @@ printedFilename==0 {
 
 ## beginning of comment
 /^[[:blank:]]*'''[[:blank:]]*/ && insideComment!=1 {
-	if (lastEnumLine!=""){	
+	if (insideEnum==1){	
 	
-		# if enum is being processed, add comment to lastEnumLine
+		# if enum is being processed, add comment to enumComment
 		# instead of printing it
-		
-		lastEnumLine = lastEnumLine ",\n" appShift "/**";
+		if (enumComment!="") {
+			enumComment = enumComment "\n" appShift "/**";
+		} else {
+			enumComment = appShift "/**";
+		}
 		
 	} else {
 	
@@ -244,10 +246,10 @@ printedFilename==0 {
 /^[[:blank:]]*'''/ {
 	if(insideComment==1){
 		commentString=substr($0,index($0,"'")+3);
-		# if enum is being processed, add comment to lastEnumLine
+		# if enum is being processed, add comment to enumComment
 		# instead of printing it
-		if (lastEnumLine!=""){	
-			lastEnumLine = lastEnumLine "\n" appShift commentString;
+		if (insideEnum==1){
+			enumComment = enumComment "\n" appShift commentString;
 		} else {
 			print appShift commentString;
 		}
@@ -257,10 +259,10 @@ printedFilename==0 {
 
 ## end of comment
 (!(/[[:blank:]]*'/)) && insideComment==1 {
-	# if enum is being processed, add comment to lastEnumLine
+	# if enum is being processed, add comment to enumComment
 	# instead of printing it
-	if (lastEnumLine!=""){	
-		lastEnumLine = lastEnumLine "\n" appShift "**/";
+	if (insideEnum==1){	
+		enumComment = enumComment "\n" appShift "**/";
 	} else {
 		print appShift "**/";
 	}
@@ -272,7 +274,7 @@ printedFilename==0 {
 # inline comments in c# style /** ... */
 #############################################################################
 /.*'+/ && insideComment!=1 {
-	sub("[[:blank:]]*'"," /**");
+	sub("[[:blank:]]*'"," /**<");
 	$0 = $0" */"
 }
 
@@ -295,25 +297,23 @@ printedFilename==0 {
 	print appShift "}"
 	insideEnum=0;
 	lastEnumLine="";
+	enumComment="";
 	next;
 }
 
 insideEnum==1 {
 	if ( lastEnumLine == "" ) {
 		lastEnumLine = $0;
-		EnumSep=","
 	} else {
-		# was last line a comment? then "," has been already inserted
-		if(lastEnumLine ~ /**\/$/) EnumSep="";
-		# process inline comments correctly
-		commentPart=substr(lastEnumLine,index($0,"/"));
-		definitionPart=substr(lastEnumLine,0,index($0,"/")-1);
-		if (definitionPart=="") print appShift commentPart EnumSep;
+		commentPart=substr(lastEnumLine,match(lastEnumLine,"[/][*][*]<"));
+		if (enumComment!="") print enumComment;
+		enumComment="";
+		definitionPart=substr(lastEnumLine,0,match(lastEnumLine,"[/][*][*]<")-1);
+		if (definitionPart=="") print appShift commentPart ",";
 		else {
-			print appShift definitionPart EnumSep " "commentPart
+			print appShift definitionPart ", " commentPart
 		}
 		lastEnumLine = $0;
-		EnumSep=","
 	}
 }
 
