@@ -130,9 +130,9 @@ fullLine==0{
 		printedFilename=1
 		# print @file line at the beginning
 		file=gensub(/\\/, "/", "G", FILENAME)
-		print "/**\n @file "basename[split(file, basename , "/")];
+		print "/**\n * @file "basename[split(file, basename , "/")];
 	}
-	sub(".*'+","");		# remove leading "'"
+	sub(".*'+"," * ");		# remove leading "'"
 	print $0;
 	next;
 }
@@ -141,7 +141,7 @@ fullLine==0{
 # the header ends here
 fileHeader!=2 {
 	if (fileHeader!=0) {
-		print "**/";
+		print " */";
 	}
 	fileHeader=2;
 }
@@ -242,10 +242,10 @@ printedFilename==0 {
 	insideComment=1;
 }
 
-## strip leasing '''
+## strip leading '''
 /^[[:blank:]]*'''/ {
 	if(insideComment==1){
-		commentString=substr($0,index($0,"'")+3);
+		commentString=gensub("'''"," * ","g",$0);
 		# if enum is being processed, add comment to enumComment
 		# instead of printing it
 		if (insideEnum==1){
@@ -262,9 +262,9 @@ printedFilename==0 {
 	# if enum is being processed, add comment to enumComment
 	# instead of printing it
 	if (insideEnum==1){	
-		enumComment = enumComment "\n" appShift "**/";
+		enumComment = enumComment "\n" appShift " */";
 	} else {
-		print appShift "**/";
+		print appShift " */";
 	}
 	insideComment=0;
 }
@@ -306,6 +306,7 @@ insideEnum==1 {
 		lastEnumLine = $0;
 	} else {
 		commentPart=substr(lastEnumLine,match(lastEnumLine,"[/][*][*]<"));
+		# print leading comment, if present
 		if (enumComment!="") print enumComment;
 		enumComment="";
 		definitionPart=substr(lastEnumLine,0,match(lastEnumLine,"[/][*][*]<")-1);
@@ -316,6 +317,28 @@ insideEnum==1 {
 		lastEnumLine = $0;
 	}
 }
+
+#############################################################################
+# Declares
+#############################################################################
+#[DllImport("kernel32.dll")]
+
+
+/.*Declare[[:blank:]]+/ {
+	libName=gensub(".+Lib[[:blank:]]+\"([^ ]*)\"[[:blank:]].*","\\1","g");
+	if (match($0,"Alias")>0) aliasName=gensub(".+Alias[[:blank:]]+\"([^ ]*)\"[[:blank:]].*"," (Alias: \\1)","g");
+	print appShift "/** Is imported from extern library: " libName aliasName " */";
+	libName="";
+	aliasName="";
+}
+
+# remove lib and alias from declares
+/.*Lib[[:blank:]]+/ {
+	sub("Lib[[:blank:]]+[^[:blank:]]+","");
+	sub("Alias[[:blank:]]+[^[:blank:]]+","");
+}
+
+
 
 #############################################################################
 # types (handle As)
@@ -346,12 +369,6 @@ function convertSimpleType(Param)
 	l="";
 	delete aParam;
 	return newParam;
-}
-
-# remove lib and alias from declares
-/.*Lib[[:blank:]]+/ {
-	sub("Lib[[:blank:]]+[^[:blank:]]+","");
-	sub("Alias[[:blank:]]+[^[:blank:]]+","");
 }
 
 
@@ -398,6 +415,7 @@ function convertSimpleType(Param)
 		
 		postParams=substr($0,index($0,")")+1) 
 		
+		# handle type def of functions and properties
 		lpostParams=split(postParams, apostParams , " ")
 		if (lpostParams > 0) {
 			if (apostParams[1] == "As") {
@@ -409,6 +427,7 @@ function convertSimpleType(Param)
 			}			
 		}
 		
+		# put everything back together
 		$0="";
 		for (i = 1; i <= lpreParams; i++) {
 			if (apreParams[i]!="")	$0=$0 apreParams[i]" ";
@@ -444,7 +463,7 @@ function convertSimpleType(Param)
 /^.*End[[:blank:]]+Namespace/ && insideNamespace==1{
 	ReduceShift();
 	print appShift "}";
-	insideNamespace=0;;
+	insideNamespace=0;
 	next;
 }
 
@@ -456,6 +475,7 @@ function convertSimpleType(Param)
 	sub("Class","class");
 	sub("Structure","struct");
 	
+	# handle subclasses
 	if (insideClass==1) {
 		insideSubClass=1;
 	} else {
