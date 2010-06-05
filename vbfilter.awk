@@ -574,5 +574,9 @@ isInherited==1{
 }
 
 END{
+	# close file header if file contains no code
+	if (fileHeader!=2 && fileHeader!=0) {
+		print " */";
+	}
 	if (leadingNamespace==2) print "}";
 }
