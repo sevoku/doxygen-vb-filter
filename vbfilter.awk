@@ -226,7 +226,7 @@ printedFilename==0 {
 		
 	} else {
 	
-		# if inharitance is being processed, then add comment to lastLine
+		# if inheritance is being processed, then add comment to lastLine
 		# instead of printing it and process the end of
 		# class/interface declaration
 		
@@ -487,7 +487,7 @@ function convertSimpleType(Param)
 	next
 }
 
-# handle inheritations
+# handle inheritance
 isInherited==1{
 	if(($0 ~ /^[[:blank:]]*Inherits[[:blank:]]+/) || ($0 ~ /^[[:blank:]]*Implements[[:blank:]]+/)) {
 		
