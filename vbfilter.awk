@@ -105,10 +105,10 @@ fullLine==0{
 /^$/ { next; }
 
 #############################################################################
-# remove leading whitespaces
+# remove leading whitespaces and tabs
 #############################################################################
-/^[ ]/{
-	sub(/^[ ]*/, "")
+/^[ \t]/{
+	sub(/^[ \t]*/, "")
 }
 
 #############################################################################
@@ -253,7 +253,7 @@ printedFilename==0 {
 		} else {
 			print appShift commentString;
 		}
-		next
+		next;
 	}
 }
 
@@ -304,18 +304,21 @@ printedFilename==0 {
 insideEnum==1 {
 	if ( lastEnumLine == "" ) {
 		lastEnumLine = $0;
-	} else {
-		commentPart=substr(lastEnumLine,match(lastEnumLine,"[/][*][*]<"));
-		# print leading comment, if present
 		if (enumComment!="") print enumComment;
 		enumComment="";
-		definitionPart=substr(lastEnumLine,0,match(lastEnumLine,"[/][*][*]<")-1);
+	} else {
+		commentPart=substr(lastEnumLine,match(lastEnumLine,"[/][*][*]<"));
+		definitionPart=substr(lastEnumLine,0,match(lastEnumLine,"[/][*][*]<")-2);
 		if (definitionPart=="") print appShift commentPart ",";
 		else {
 			print appShift definitionPart ", " commentPart
 		}
 		lastEnumLine = $0;
+		# print leading comment of next element, if present
+		if (enumComment!="") print enumComment;
+		enumComment="";
 	}
+	next;
 }
 
 #############################################################################
