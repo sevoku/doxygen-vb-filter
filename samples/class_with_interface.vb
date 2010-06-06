@@ -15,6 +15,7 @@ Public Enum SampleEnum As Short
 	''' <summary>
 	''' second value
 	''' </summary>
+	Value2
     Value3 = 1234  ' third assigned value
     Value4         ' fourth value
 End Enum
