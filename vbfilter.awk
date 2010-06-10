@@ -206,6 +206,12 @@ printedFilename==0 {
 /.*Protected[[:blank:]]+/ {
 	sub(".*Protected[[:blank:]]+","protected ");
 }
+# add "static" to all Shared members
+/.*Shared[[:blank:]]+/ {
+	sub("Shared", "static Shared");
+}
+
+	
 
 
 #############################################################################
@@ -485,10 +491,19 @@ function convertSimpleType(Param)
 		insideClass=1;
 	}
 	
+	# save class name for constructor handling
+	className=gensub(".+class[[:blank:]]+([^ ]*).*","\\1","g");
+	
 	isInherited=1;
-	print appShift $0
-	next
+	print appShift $0;
+	next;
 }
+
+# handle constructors
+/.*Sub[[:blank:]]+New.*/ && className!="" {
+	sub("New", "New " className);
+}
+
 
 # handle inheritance
 isInherited==1{
@@ -498,20 +513,20 @@ isInherited==1{
 		{
 			sub("Inherits",":");
 			sub("Implements",":");
-			lastLine=$0
+			lastLine=$0;
 		}
 		else
 		{
 			sub(".*Inherits",",");
 			sub(".*Implements",",");
-			lastLine=lastLine $0
+			lastLine=lastLine $0;
 		}
 	}
 	else {
 		isInherited=0;
 		if (lastLine!="") print appShift lastLine;
-		print appShift "{"
-		AddShift()
+		print appShift "{";
+		AddShift();
 		lastLine="";
 	}
 }
@@ -522,9 +537,10 @@ isInherited==1{
 	} else {
 		insideClass=0;
 	}
-	ReduceShift()
-	print appShift "}"
-	next
+	ReduceShift();
+	print appShift "}";
+	className="";
+	next;
 }
 
 
@@ -556,6 +572,7 @@ isInherited==1{
 /.*Declare[[:blank:]]+/ ||
 /.*[[:blank:]]Event[[:blank:]]+/ ||
 /.*Const[[:blank:]]+/ {
+
 	
 	# remove square brackets from reserved names
 	# but do not match array brackets
