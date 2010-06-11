@@ -152,7 +152,7 @@ fileHeader!=2 {
 printedFilename==0 {
 	printedFilename=1;
 	file=gensub(/\\/, "/", "G", FILENAME)
-	print "/*! @file "basename[split(file, basename , "/")]" */";
+	print "/// @file "basename[split(file, basename , "/")]"\n";
 }
 
 #############################################################################
@@ -161,7 +161,7 @@ printedFilename==0 {
 # remark: doxygen seems not to recognize
 #         c# using directives so converting Imports is maybe useless?
 #############################################################################
-/^Imports[[:blank:]]+/ {
+/.*Imports[[:blank:]]+/ {
 	sub("Imports","using");
 	print $0";";
 	insideImports=1;
@@ -189,28 +189,6 @@ printedFilename==0 {
 	}
 	insideImports=0;
 }
-
-#############################################################################
-# simple rewrites
-# vb -> c# style
-#############################################################################
-/.*Private[[:blank:]]+/ {
-	sub(".*Private[[:blank:]]+","private ");
-}
-/.*Public[[:blank:]]+/ {
-	sub(".*Public[[:blank:]]+","public ");
-}
-/.*Friend[[:blank:]]+/ {
-	sub(".*Friend[[:blank:]]+","friend ");
-}
-/.*Protected[[:blank:]]+/ {
-	sub(".*Protected[[:blank:]]+","protected ");
-}
-# add "static" to all Shared members
-/.*Shared[[:blank:]]+/ {
-	sub("Shared", "static Shared");
-}
-
 	
 
 
@@ -221,7 +199,6 @@ printedFilename==0 {
 ## beginning of comment
 (/^[[:blank:]]*'''[[:blank:]]*/ || /^[[:blank:]]*'[[:blank:]]*[\\<][^ ].+/) && insideComment!=1 {
 	if (insideEnum==1){	
-	
 		# if enum is being processed, add comment to enumComment
 		# instead of printing it
 		if (enumComment!="") {
@@ -279,10 +256,40 @@ printedFilename==0 {
 #############################################################################
 # inline comments in c# style /** ... */
 #############################################################################
-/.*'+/ && insideComment!=1 {
+# strip all commented lines, if not part of a comment block
+/^'+/ && insideComment!=1 {
+	next;
+}
+/.+'+/ && insideComment!=1 {
 	sub("[[:blank:]]*'"," /**<");
 	$0 = $0" */"
 }
+
+
+#############################################################################
+# simple rewrites
+# vb -> c# style
+#############################################################################
+/^Private[[:blank:]]+/ {
+	sub(".*Private[[:blank:]]+","private ");
+}
+/^Public[[:blank:]]+/ {
+	sub(".*Public[[:blank:]]+","public ");
+}
+# friend is the same as internal in c#, but Doxygen doesn't support internal,
+# so make it private to get it recognized by Doxygen) and Friend appera
+# in Documentation
+/^Friend[[:blank:]]+/ {
+	sub(".*Friend[[:blank:]]+","private Friend ");
+}
+/^Protected[[:blank:]]+/ {
+	sub(".*Protected[[:blank:]]+","protected ");
+}
+# add "static" to all Shared members
+/^Shared[[:blank:]]+/ {
+	sub("Shared", "static Shared");
+}
+
 
 #############################################################################
 # Enums
@@ -297,7 +304,7 @@ printedFilename==0 {
 	next;
 }
 
-/^.*End[[:blank:]]+Enum/ && insideEnum==1{
+/^[ \t]*End[[:blank:]]+Enum/ && insideEnum==1{
 	print appShift lastEnumLine;
 	ReduceShift()
 	print appShift "}"
