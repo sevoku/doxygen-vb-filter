@@ -219,7 +219,7 @@ printedFilename==0 {
 #############################################################################
 
 ## beginning of comment
-/^[[:blank:]]*'''[[:blank:]]*/ && insideComment!=1 {
+(/^[[:blank:]]*'''[[:blank:]]*/ || /^[[:blank:]]*'[[:blank:]]*[\\<][^ ].+/) && insideComment!=1 {
 	if (insideEnum==1){	
 	
 		# if enum is being processed, add comment to enumComment
@@ -249,9 +249,9 @@ printedFilename==0 {
 }
 
 ## strip leading '''
-/^[[:blank:]]*'''/ {
+/^[[:blank:]]*'/ {
 	if(insideComment==1){
-		commentString=gensub("'''"," * ","g",$0);
+		commentString=gensub("[']+"," * ","g",$0);
 		# if enum is being processed, add comment to enumComment
 		# instead of printing it
 		if (insideEnum==1){
