@@ -117,6 +117,14 @@ Public Class SampleClass
     End Function
 
     ''' <summary>
+    ''' shared/static function
+    ''' </summary>
+    ''' <returns>a String value</returns>
+    Function SampleFunction() As String
+
+    End Function
+
+    ''' <summary>
     ''' simple method
     ''' </summary>
     ''' <remarks></remarks>
