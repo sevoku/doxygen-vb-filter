@@ -120,7 +120,7 @@ Public Class SampleClass
     ''' shared/static function
     ''' </summary>
     ''' <returns>a String value</returns>
-    Function SampleFunction() As String
+    Shared Function SampleFunction() As String
 
     End Function
 
