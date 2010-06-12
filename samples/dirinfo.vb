@@ -6,12 +6,12 @@
 ' with applied patches from <A HREF="http://trac.sevo.org/projects/doxyvb/wiki/WikiStart/Preparing/">http://trac.sevo.org/projects/doxyvb/wiki/WikiStart/Preparing/</A><BR>
 ' (See also the <A HREF="https://bugzilla.gnome.org/show_bug.cgi?id=619728">Doxygen Bug 619728</A>)
 '
-' VB .NET filter is an awk filter for use with Doxygen developed by Vsevolod Kukol.
+' VB .NET filter is a awk script by Vsevolod Kukol, which adds VB.NET support to <A HREF="http://www.stack.nl/~dimitri/doxygen/index.html">Doxygen</A>.<BR>
 ' Project page: <A HREF="http://trac.sevo.org/projects/doxyvb/">http://trac.sevo.org/projects/doxyvb/</A>
 '
-' The Doxyfile used to generate this documentation and the documented sample sources can be found here: <BR>
+' The Doxyfile used to generate this documentation and the documented exsample sources can be found here: <BR>
 ' <A HREF="http://trac.sevo.org/projects/doxyvb/browser/trunk/samples/">http://trac.sevo.org/projects/doxyvb/browser/trunk/samples/</A>
 '
 ' \dir samples contains example files demostrating Doxygen VB.NET filer functionality
-' \package samples <summary>contains example files demostrating Doxygen VB.NET filer functionality</summary>
+' \package samples <summary>contains example classes demostrating Doxygen VB.NET filter functionality</summary>
 
