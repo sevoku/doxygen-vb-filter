@@ -265,28 +265,34 @@ printedFilename==0 {
 	$0 = $0" */"
 }
 
+#############################################################################
+# strip compiler options
+#############################################################################
+/.*<.*>.*/ {
+	gsub("<.*>[ ]+","");
+}
 
 #############################################################################
 # simple rewrites
 # vb -> c# style
 #############################################################################
-/^Private[[:blank:]]+/ {
-	sub(".*Private[[:blank:]]+","private ");
+/^.*Private[[:blank:]]+/ {
+	sub("Private[[:blank:]]+","private ");
 }
-/^Public[[:blank:]]+/ {
-	sub(".*Public[[:blank:]]+","public ");
+/^.*Public[[:blank:]]+/ {
+	sub("Public[[:blank:]]+","public ");
 }
 # friend is the same as internal in c#, but Doxygen doesn't support internal,
-# so make it private to get it recognized by Doxygen) and Friend appera
+# so make it private to get it recognized by Doxygen) and Friend appear
 # in Documentation
-/^Friend[[:blank:]]+/ {
-	sub(".*Friend[[:blank:]]+","private Friend ");
+/^.*Friend[[:blank:]]+/ {
+	sub("Friend[[:blank:]]+","private Friend ");
 }
-/^Protected[[:blank:]]+/ {
-	sub(".*Protected[[:blank:]]+","protected ");
+/^.*Protected[[:blank:]]+/ {
+	sub("Protected[[:blank:]]+","protected ");
 }
 # add "static" to all Shared members
-/^Shared[[:blank:]]+/ {
+/^.*Shared[[:blank:]]+/ {
 	sub("Shared", "static Shared");
 }
 
@@ -337,8 +343,6 @@ insideEnum==1 {
 #############################################################################
 # Declares
 #############################################################################
-#[DllImport("kernel32.dll")]
-
 
 /.*Declare[[:blank:]]+/ {
 	libName=gensub(".+Lib[[:blank:]]+\"([^ ]*)\"[[:blank:]].*","\\1","g");
@@ -357,8 +361,12 @@ insideEnum==1 {
 
 
 #############################################################################
-# types (handle As)
+# types (handle As and Of)
 #############################################################################
+
+/.*[(]Of[ ][^ ]+[)].*/ {
+	$0=gensub("[(]Of[ ]([^ ]+)[)]", "<\\1>","g",$0);
+}
 
 ## converts a single type definition to c#
 ##  "Var As Type" -> "Type Var"
@@ -405,7 +413,7 @@ function convertSimpleType(Param)
 			$0=$0 " " aFull[i];
 		}
 	}
-	
+		
 	# simple member definition without brackets
 	if (index($0,"(") == 0) {
 		$0=convertSimpleType($0);
@@ -430,7 +438,6 @@ function convertSimpleType(Param)
 		}
 		
 		postParams=substr($0,index($0,")")+1) 
-		
 		# handle type def of functions and properties
 		lpostParams=split(postParams, apostParams , " ")
 		if (lpostParams > 0) {
@@ -555,7 +562,7 @@ isInherited==1{
 #############################################################################
 # Properties
 #############################################################################
-/.*[[:blank:]]Property[[:blank:]]+/ {
+/.*Property[[:blank:]]+/ {
 	# add c# styled get/set methods
 	if (match($0,"ReadOnly")) {
 		#sub("ReadOnly[[:blank:]]","");
