@@ -1,13 +1,13 @@
 #----------------------------------------------------------------------------
-# vbfilter.awk - doxygen VB .NET filter script - v1.2
+# vbfilter.awk - doxygen VB .NET filter script - pre v2.0
 #
 # Creation:     26.05.2010  Vsevolod Kukol
-# Last Update:  10.06.2010  Vsevolod Kukol
+# Last Update:  17.06.2010  Vsevolod Kukol
 #
 # Copyright (c) 2010 Vsevolod Kukol, sevo(at)sevo(dot)org
 #
 # Inspired by the Visual Basic convertion script written by
-# Mathias Henze. Rewritten from scratch for VB .NET by
+# Mathias Henze. Rewritten from scratch for VB.NET by
 # Vsevolod Kukol.
 #
 # requirements: doxygen, gawk
@@ -98,12 +98,6 @@ fullLine==0{
  	next;
 
 }
-
-#############################################################################
-# skip empty lines
-#############################################################################
-/^$/ { next; }
-
 #############################################################################
 # remove leading whitespaces and tabs
 #############################################################################
@@ -155,6 +149,12 @@ printedFilename==0 {
 	print "/// @file "basename[split(file, basename , "/")]"\n";
 }
 
+
+#############################################################################
+# skip empty lines
+#############################################################################
+/^$/ { next; }
+
 #############################################################################
 # convert Imports to C# style
 #
@@ -189,7 +189,7 @@ printedFilename==0 {
 	}
 	insideImports=0;
 }
-	
+
 
 
 #############################################################################
@@ -491,12 +491,20 @@ function convertSimpleType(Param)
 }
 
 #############################################################################
-# interfaces
+# interfaces, classes, structures
 #############################################################################
-/.*Interface[[:blank:]]+/ || /.*Class[[:blank:]]+/ || /.*Structure[[:blank:]]+/ {
+/^Interface[[:blank:]]+/ ||
+/.*[[:blank:]]Interface[[:blank:]]+/ ||
+/^Class[[:blank:]]+/ ||
+/.*[[:blank:]]Class[[:blank:]]+/ ||
+/^Structure[[:blank:]]+/ ||
+/.*[[:blank:]]Structure[[:blank:]]+/ ||
+/^Type[[:blank:]]+/ ||
+/.*[[:blank:]]Type[[:blank:]]+/ {
 	sub("Interface","interface");
 	sub("Class","class");
 	sub("Structure","struct");
+	sub("Type","struct");
 	
 	# handle subclasses
 	if (insideClass==1) {
@@ -545,7 +553,11 @@ isInherited==1{
 	}
 }
 
-(/^.*End[[:blank:]]+Interface/ || /.*End[[:blank:]]+Class.*/ || /^.*End[[:blank:]]+Structure/) && (insideClass==1 || insideSubClass==1){
+(/.*End[[:blank:]]+Interface/ ||
+ /.*End[[:blank:]]+Class.*/ ||
+ /.*End[[:blank:]]+Structure/ ||
+ /.*End[[:blank:]]+Type/) &&
+ (insideClass==1 || insideSubClass==1){
 	if (insideSubClass==1) {
 		insideSubClass=0;
 	} else {
@@ -574,6 +586,10 @@ isInherited==1{
 	next
 }
 
+/.*Operator[[:blank:]]+/ {
+	$0=gensub("Operator[[:blank:]]+([^ ]+)[[:blank:]]+","\\1 operator ","g",$0);
+}
+
 #############################################################################
 # process everything else
 #############################################################################
@@ -586,8 +602,7 @@ isInherited==1{
 /.*Declare[[:blank:]]+/ ||
 /.*[[:blank:]]Event[[:blank:]]+/ ||
 /.*Const[[:blank:]]+/ {
-
-	
+		
 	# remove square brackets from reserved names
 	# but do not match array brackets
 	#  "Integer[]" is not replaced
