@@ -117,6 +117,16 @@ Public Class SampleClass
     End Function
 
     ''' <summary>
+    ''' simple operator
+    ''' </summary>
+    ''' <param name="Obj1">first simple object</param>
+    ''' <param name="Obj2">second simple object</param>
+    ''' <returns>True if Obj1 equal to, or bigger than Obj2</returns>
+    Public Shared Operator +(ByVal Obj1 As SampleClass, _
+                             ByVal Obj2 As SampleClass) As Boolean
+    End Operator
+
+    ''' <summary>
     ''' shared/static function
     ''' </summary>
     ''' <returns>a String value</returns>
