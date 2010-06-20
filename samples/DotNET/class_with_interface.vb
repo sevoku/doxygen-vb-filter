@@ -1,6 +1,6 @@
 ' <summary>example file demonstrating interfaces and classes</summary>
 ' <remarks>detailed file description comes here<BR><BR>
-' The original unfiltered source of this file : <A HREF="http://trac.sevo.org/projects/doxyvb/browser/trunk/samples/class_with_interface.vb">class_with_interface.vb</A></remarks>
+' The original unfiltered source of this file : <A HREF="http://trac.sevo.org/projects/doxyvb/browser/trunk/samples/DotNET/class_with_interface.vb">class_with_interface.vb</A></remarks>
 
 Imports System.IO
 Imports System.Threading
@@ -72,7 +72,7 @@ End Interface
 ''' <summary>
 ''' simple class implementing an interface
 ''' </summary>
-''' <remarks>implements ISample</remarks>
+''' <remarks>Implements ISample</remarks>
 Public Class SampleClass
     Implements ISample
 
@@ -84,7 +84,6 @@ Public Class SampleClass
     ''' </summary>
     ''' <value>some string</value>
     ''' <returns>some string</returns>
-    ''' <remarks>implements ISample.IntegerProperty</remarks>
     Public Property StringProperty() As String Implements ISample.StringProperty
         Get
             Return someString
@@ -99,7 +98,6 @@ Public Class SampleClass
     ''' </summary>
     ''' <value>integer value</value>
     ''' <returns>same interger value</returns>
-    ''' <remarks>implements <see cref="ISample.IntegerProperty">IntegerProperty</see></remarks>
     Public ReadOnly Property IntegerProperty() As Integer Implements ISample.IntegerProperty
         Get
             Return someInteger
@@ -165,7 +163,7 @@ Public Class SampleClass
     ''' IDisposable implementation
     ''' </summary>
     ''' <param name="disposing"></param>
-    ''' <remarks></remarks>
+    ''' <remarks>Is called from default Dispose method.</remarks>
     Protected Overridable Sub Dispose(ByVal disposing As Boolean)
         If Not Me.disposedValue Then
             If disposing Then

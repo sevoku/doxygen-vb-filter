@@ -2,12 +2,12 @@
 # vbfilter.awk - doxygen VB .NET filter script - pre v2.0
 #
 # Creation:     26.05.2010  Vsevolod Kukol
-# Last Update:  17.06.2010  Vsevolod Kukol
+# Last Update:  20.06.2010  Vsevolod Kukol
 #
 # Copyright (c) 2010 Vsevolod Kukol, sevo(at)sevo(dot)org
 #
 # Inspired by the Visual Basic convertion script written by
-# Mathias Henze. Rewritten from scratch for VB.NET by
+# Mathias Henze. Rewritten from scratch with VB.NET support by
 # Vsevolod Kukol.
 #
 # requirements: doxygen, gawk
@@ -56,6 +56,9 @@ BEGIN{
 	fileHeader=0;
 	fullLine=1;
 	insideClass=0;
+	insideVB6Class=0;
+	insideVB6ClassName="";
+	insideVB6Header=0;
 	insideSubClass=0;
 	insideNamespace=0;
 	insideComment=0;
@@ -63,6 +66,7 @@ BEGIN{
 	isInherited=0;
 	lastLine="";
 	appShift="";
+	
 }
 
 #############################################################################
@@ -113,11 +117,52 @@ fullLine==0{
 	next;
 }
 
+
+#############################################################################
+# VB6 file headers including class definitions
+#############################################################################
+
+# if file begins with a class definition, swith to VB6 mode
+/.*[[:blank:]]+CLASS/ ||
+/.*[[:blank:]]+VB\.Form[[:blank:]]+/ ||
+/.*[[:blank:]]+VB\.UserControl[[:blank:]]+/ {
+	insideVB6Class=1;
+	next;
+}
+
+# ignore first line in VB6 forms
+/.*VERSION[[:blank:]]+[0-9]+/ {
+	next;
+}
+
+# get VB6 class name
+/^Attribute[[:blank:]]+VB_Name.*/ {
+	insideVB6ClassName=gensub(".*VB_Name[[:blank:]]+[=][[:blank:]]+\"(.*)\"","\\1","g",$0);
+	insideVB6Header=1
+}
+
+# detect when class attributes begin, to recognize the end of VB6 header
+/^Attribute[[:blank:]]+.*/ {
+	insideVB6Header=1
+	next;
+}
+
+# detect the end of VB6 header
+(!(/^Attribute[[:blank:]]+.*/)) && insideVB6Class==1 && insideVB6Header<=1{
+	if (insideVB6Header==0) {
+		next;
+	} else {
+		insideVB6Header=2
+	}
+}
+
+
 #############################################################################
 # parse file header comment
 #############################################################################
 
-/.*'/ && fileHeader!=2 {
+/^[[:blank:]]*'/ && fileHeader!=2 {
+
 	# check if header already processed
 	if (fileHeader==0) {
 		fileHeader=1;
@@ -125,9 +170,21 @@ fullLine==0{
 		# print @file line at the beginning
 		file=gensub(/\\/, "/", "G", FILENAME)
 		print "/**\n * @file "basename[split(file, basename , "/")];
+		# if inside VB6 class module, then the file header describes the
+		# class itself and should be printed after 
+		if (insideVB6Class==1) {
+			print " * \\brief Single VB6 class module, defining " insideVB6ClassName;
+			print " */";
+			if (leadingNamespace==1) {	# leading namespace enabled?
+				# get project name from the file path
+				print "namespace "basename[split(file, basename , "/")-1]" {";
+				AddShift()
+			}
+			print appShift " /**";
+		}
 	}
 	sub(".*'+"," * ");		# remove leading "'"
-	print $0;
+	print appShift $0;
 	next;
 }
 
@@ -135,7 +192,7 @@ fullLine==0{
 # the header ends here
 fileHeader!=2 {
 	if (fileHeader!=0) {
-		print " */";
+		print appShift " */";
 	}
 	fileHeader=2;
 }
@@ -146,7 +203,18 @@ fileHeader!=2 {
 printedFilename==0 {
 	printedFilename=1;
 	file=gensub(/\\/, "/", "G", FILENAME)
-	print "/// @file "basename[split(file, basename , "/")]"\n";
+		if (insideVB6Class!=1) {
+			print "/// @file "basename[split(file, basename , "/")]"\n";
+		} else {
+			print "/**\n * @file "basename[split(file, basename , "/")];
+			print " * \\brief Single VB6 class module, defining " insideVB6ClassName;
+			print " */";
+			if (leadingNamespace==1) {	# leading namespace enabled?
+				# get project name from the file path
+				print "namespace "basename[split(file, basename , "/")-1]" {";
+				AddShift()
+			}
+		}
 }
 
 
@@ -178,16 +246,23 @@ printedFilename==0 {
 #############################################################################
 (!/^Imports[[:blank:]]+/) && leadingNamespace<=1 && fileHeader==2{
 	if (leadingNamespace==1) {	# leading namespace enabled?
-		file=gensub(/\\/, "/", "G", FILENAME)
-		# get project name from the file path
-		print "namespace "basename[split(file, basename , "/")-1]" {";
+		# if inside VB6 file, then namespace was already printed
+		if (insideVB6Class!=1) {
+			file=gensub(/\\/, "/", "G", FILENAME)
+			# get project name from the file path
+			print "namespace "basename[split(file, basename , "/")-1]" {";
+			AddShift()
+		}
 		leadingNamespace=2;	# is checked by the END function to print corresponding "}"
-		AddShift()
 	} else {
 		# reduce leading shift
 		leadingNamespace=3;
 	}
 	insideImports=0;
+	if (insideVB6Class==1) {
+		isInherited=1;
+		print appShift "class " insideVB6ClassName;
+	}
 }
 
 
@@ -241,7 +316,7 @@ printedFilename==0 {
 }
 
 ## end of comment
-(!(/[[:blank:]]*'/)) && insideComment==1 {
+(!(/^[[:blank:]]*'/)) && insideComment==1 {
 	# if enum is being processed, add comment to enumComment
 	# instead of printing it
 	if (insideEnum==1){	
@@ -252,7 +327,6 @@ printedFilename==0 {
 	insideComment=0;
 }
 
-
 #############################################################################
 # inline comments in c# style /** ... */
 #############################################################################
@@ -261,7 +335,7 @@ printedFilename==0 {
 	next;
 }
 /.+'+/ && insideComment!=1 {
-	sub("[[:blank:]]*'"," /**<");
+	sub("[[:blank:]]*'"," /**< \\brief ");
 	$0 = $0" */"
 }
 
@@ -570,20 +644,33 @@ isInherited==1{
 }
 
 
+#############################################################################
+# Replace Implements with a comment linking to the interface member,
+#   since Doxygen does not recognize members with names that differ
+#   from their corresponding interface members
+#############################################################################
+/.+[[:blank:]]+Implements[[:blank:]]+/ {
+	$0=gensub("(Implements)[[:blank:]]+(.+)$","/** Implements <see cref=\"\\2\"\/> */","g",$0);
+}
 
 #############################################################################
 # Properties
 #############################################################################
-/.*Property[[:blank:]]+/ {
+# skip VB6 Set/Let Property methods
+/.*Property[[:blank:]]+Set[[:blank:]]+/ ||
+/.*Property[[:blank:]]+Let[[:blank:]]+/ { next; }
+
+/^Property[[:blank:]]+/ ||
+/.*[[:blank:]]+Property[[:blank:]]+/ {
 	# add c# styled get/set methods
 	if (match($0,"ReadOnly")) {
 		#sub("ReadOnly[[:blank:]]","");
-		$0=$0" { get; }"
+		$0=$0 "\n" appShift "{ get; }";
 	} else {
-		$0=$0" { get; set; }"
+		$0=$0 "\n" appShift "{ get; set; }";
 	}
-	print appShift $0
-	next
+	print appShift $0;
+	next;
 }
 
 /.*Operator[[:blank:]]+/ {
@@ -597,11 +684,15 @@ isInherited==1{
 /.*public[[:blank:]]+/ ||
 /.*protected[[:blank:]]+/ ||
 /.*friend[[:blank:]]+/ ||
-/.*Sub[[:blank:]]+/ ||
-/.*Function[[:blank:]]+/ ||
+/^Sub[[:blank:]]+/ ||
+/.*[[:blank:]]+Sub[[:blank:]]+/ ||
+/^Function[[:blank:]]+/ ||
+/.*[[:blank:]]+Function[[:blank:]]+/ ||
 /.*Declare[[:blank:]]+/ ||
-/.*[[:blank:]]Event[[:blank:]]+/ ||
-/.*Const[[:blank:]]+/ {
+/^Event[[:blank:]]+/ ||
+/.*[[:blank:]]+Event[[:blank:]]+/ ||
+/.*Const[[:blank:]]+/ ||
+/.*[[:blank:]]+Const[[:blank:]]+/ {
 		
 	# remove square brackets from reserved names
 	# but do not match array brackets
@@ -627,5 +718,6 @@ END{
 	if (fileHeader!=2 && fileHeader!=0) {
 		print " */";
 	}
+	if (insideVB6Class==1) print ShiftRight "}";
 	if (leadingNamespace==2) print "}";
 }
