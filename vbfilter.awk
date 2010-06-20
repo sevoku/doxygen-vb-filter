@@ -650,7 +650,11 @@ isInherited==1{
 #   from their corresponding interface members
 #############################################################################
 /.+[[:blank:]]+Implements[[:blank:]]+/ {
-	$0=gensub("(Implements)[[:blank:]]+(.+)$","/** Implements <see cref=\"\\2\"\/> */","g",$0);
+	if ($0 ~ /.*Property[[:blank:]]+.*/) {
+		$0=gensub("(Implements)[[:blank:]]+(.+)$","/** Implements <see cref=\"\\2\"\/> */","g",$0);
+	} else {
+		$0=gensub("(Implements)[[:blank:]]+(.+)$","/**< Implements <see cref=\"\\2\"\/> */","g",$0);
+	}
 }
 
 #############################################################################
