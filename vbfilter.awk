@@ -1,8 +1,8 @@
 #----------------------------------------------------------------------------
-# vbfilter.awk - doxygen VB .NET filter script - pre v2.0
+# vbfilter.awk - doxygen VB .NET filter script - v2.1
 #
 # Creation:     26.05.2010  Vsevolod Kukol
-# Last Update:  20.06.2010  Vsevolod Kukol
+# Last Update:  19.11.2010  Vsevolod Kukol
 #
 # Copyright (c) 2010 Vsevolod Kukol, sevo(at)sevo(dot)org
 #
