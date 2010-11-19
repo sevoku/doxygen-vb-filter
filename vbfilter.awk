@@ -183,7 +183,7 @@ fullLine==0{
 			print appShift " /**";
 		}
 	}
-	sub(".*'+"," * ");		# remove leading "'"
+	sub("^[ \t]*'+"," * ");		# replace leading "'"
 	print appShift $0;
 	next;
 }
@@ -303,7 +303,7 @@ printedFilename==0 {
 ## strip leading '''
 /^[[:blank:]]*'/ {
 	if(insideComment==1){
-		commentString=gensub("[']+"," * ","g",$0);
+		commentString=gensub("^[ \t]*[']+"," * ","g",$0);
 		# if enum is being processed, add comment to enumComment
 		# instead of printing it
 		if (insideEnum==1){
@@ -573,8 +573,7 @@ function convertSimpleType(Param)
 /.*[[:blank:]]Class[[:blank:]]+/ ||
 /^Structure[[:blank:]]+/ ||
 /.*[[:blank:]]Structure[[:blank:]]+/ ||
-/^Type[[:blank:]]+/ ||
-/.*[[:blank:]]Type[[:blank:]]+/ {
+/^Type[[:blank:]]+/  {
 	sub("Interface","interface");
 	sub("Class","class");
 	sub("Structure","struct");
@@ -666,12 +665,20 @@ isInherited==1{
 
 /^Property[[:blank:]]+/ ||
 /.*[[:blank:]]+Property[[:blank:]]+/ {
+	sub("[(][)]","");
+	
+	if (match($0,"[(].+[)]")) {
+		$0=gensub("[(]","[","g");
+		$0=gensub("[)]","]","g");
+	} else {
+		$0=gensub("[(][)]","","g");
+	}
 	# add c# styled get/set methods
 	if (match($0,"ReadOnly")) {
 		#sub("ReadOnly[[:blank:]]","");
-		$0=$0 "\n" appShift "{ get; }";
+		$0=$0 "\n" appShift "{ get { }; }";
 	} else {
-		$0=$0 "\n" appShift "{ get; set; }";
+		$0=$0 "\n" appShift "{ get{ }; set{ }; }";
 	}
 	print appShift $0;
 	next;
