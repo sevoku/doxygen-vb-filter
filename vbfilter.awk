@@ -1,8 +1,8 @@
 #----------------------------------------------------------------------------
-# vbfilter.awk - doxygen VB .NET filter script - v2.1
+# vbfilter.awk - doxygen VB .NET filter script - v2.2
 #
 # Creation:     26.05.2010  Vsevolod Kukol
-# Last Update:  19.11.2010  Vsevolod Kukol
+# Last Update:  06.12.2010  Vsevolod Kukol
 #
 # Copyright (c) 2010 Vsevolod Kukol, sevo(at)sevo(dot)org
 #
@@ -303,7 +303,7 @@ printedFilename==0 {
 ## strip leading '''
 /^[[:blank:]]*'/ {
 	if(insideComment==1){
-		commentString=gensub("^[ \t]*[']+"," * ","g",$0);
+		commentString=gensub("^[ \t]*[']+"," * ",1,$0);
 		# if enum is being processed, add comment to enumComment
 		# instead of printing it
 		if (insideEnum==1){
@@ -650,9 +650,9 @@ isInherited==1{
 #############################################################################
 /.+[[:blank:]]+Implements[[:blank:]]+/ {
 	if ($0 ~ /.*Property[[:blank:]]+.*/) {
-		$0=gensub("(Implements)[[:blank:]]+(.+)$","/** Implements <see cref=\"\\2\"\/> */","g",$0);
+		$0=gensub("(Implements)[[:blank:]]+(.+)$","/** Implements <see cref=\"\\2\"/> */","g",$0); 
 	} else {
-		$0=gensub("(Implements)[[:blank:]]+(.+)$","/**< Implements <see cref=\"\\2\"\/> */","g",$0);
+		$0=gensub("(Implements)[[:blank:]]+(.+)$","/**< Implements <see cref=\"\\2\"/> */","g",$0); 
 	}
 }
 
@@ -709,8 +709,8 @@ isInherited==1{
 	# but do not match array brackets
 	#  "Integer[]" is not replaced
 	#  "[Stop]" is replaced by "Stop"	
-	$0=gensub("([^\[])([\]])","\\1","g");
-	$0=gensub("([\[])([^\]])","\\2","g");
+	$0=gensub("([^[])([\\]])","\\1","g"); 
+	$0=gensub("([[])([^\\]])","\\2","g"); 
 	
 	# add semicolon before inline comment
 	if( $0 != "" ){	
