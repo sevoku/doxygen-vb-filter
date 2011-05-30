@@ -77,7 +77,9 @@ Public Class SampleClass
     Implements ISample
 
     Private someInteger As Integer ' simple private integer value
+    Public longArray() As Long     ' long array
     Public someString As String    ' simple public string value
+	
 
     ''' <summary>
     ''' simple property
@@ -147,6 +149,16 @@ Public Class SampleClass
     ''' <param name="pPointer">pinter</param>
     ''' <remarks></remarks>
     Public Sub SampleMethodWithParams(ByVal pFirst As String, ByRef pPointer As Integer) Implements ISample.SampleMethodWithParams
+
+    End Sub
+	
+    ''' <summary>
+    ''' method with an array as param
+    ''' </summary>
+    ''' <param name="pArr">integer array</param>
+    ''' <param name="pArg">simple parameter</param>
+    ''' <remarks></remarks>
+    Public Sub MethodWithArrayParams(ByVal pArr() As Integer, ByVal pArg As Integer)
 
     End Sub
 

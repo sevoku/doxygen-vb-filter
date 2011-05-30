@@ -1,10 +1,10 @@
 #----------------------------------------------------------------------------
-# vbfilter.awk - doxygen VB .NET filter script - v2.2
+# vbfilter.awk - doxygen VB .NET filter script - v2.3
 #
 # Creation:     26.05.2010  Vsevolod Kukol
-# Last Update:  06.12.2010  Vsevolod Kukol
+# Last Update:  30.05.2011  Vsevolod Kukol
 #
-# Copyright (c) 2010 Vsevolod Kukol, sevo(at)sevo(dot)org
+# Copyright (c) 2010-2011 Vsevolod Kukol, sevo(at)sevo(dot)org
 #
 # Inspired by the Visual Basic convertion script written by
 # Mathias Henze. Rewritten from scratch with VB.NET support by
@@ -469,49 +469,81 @@ function convertSimpleType(Param)
 	return newParam;
 }
 
+function rindex(string, find) {
+	ns=length(string);
+	nf=length(find);
+	for (r = ns + 1 - nf; r>=1; r--)
+		if (substr(string, r, nf) == find)
+			return r;
+	return 0;
+}
 
+
+#(/.*Function[[:blank:]]+/ ||
+#/.*Sub[[:blank:]]+/ ||
+#/.*Property[[:blank:]]+/ ||
+#/.*Event[[:blank:]]+/ ||
+#/.*Operator[[:blank:]]+/) &&
 /.*As[[:blank:]]+/ {
 	gsub("ByVal","");
 	# keep ByRef to make pointers differ from others
 	#gsub("ByRef","");
 	
-	# handle array types
-	# replace type() with type[]
-	lFull=split($0, aFull , " ")
-	$0="";
-	for (i = 1; i <= lFull; i++) {
-		if (aFull[i] == "As") aFull[i+1]=gensub("[(][)]","[]","g",aFull[i+1]);
-		if (i == 1) {
-			$0=aFull[i];
-		} else {
-			$0=$0 " " aFull[i];
-		}
-	}
-		
 	# simple member definition without brackets
 	if (index($0,"(") == 0) {
 		$0=convertSimpleType($0);
-	} else {
+	}
+	else if (match($0, ".*Sub[[:blank:]].+") ||
+	    match($0, ".*Function[[:blank:]].+") ||
+	    match($0, ".*Property[[:blank:]].+") ||
+	    match($0, ".*Event[[:blank:]].+") ||
+	    match($0, ".*Operator[[:blank:]].+")) {
 		# parametrized member
-		
 		preParams=substr($0,0,index($0,"(")-1) 
 		lpreParams=split(preParams, apreParams , " ")
 		
-		Params=substr($0,index($0,"(")+1,index($0,")")-index($0,"(")-1) 
+		Params=substr($0,index($0,"(")+1,rindex($0,")")-index($0,"(")-1)
+		
+		#if (! match(Params, ".*As.+") & ! match($0, " ) {
+		#	print "No Array";
+		#} else { print "ARRAY!"; }
+		
 		lParams=split(Params, aParams, ",")
 		Params="";
 		# loop over params and convert them
 		if (lParams > 0) {
 			for (i = 1; i <= lParams; i++) {
+			
+				
+				if(match(aParams[i],/.+[(][)].*/)) {
+					lParam=split(aParams[i], aParam , " ")
+					for (j = 1; j <= lParam; j++) {
+						if (aParam[j] == "As") {
+							aParam[j-1]=gensub("[(][)]","","g",aParam[j-1]);
+							aParam[j+1]=gensub("[(][)]","","g",aParam[j+1]);
+							aParam[j+1]=aParam[j+1]"\[\]";
+						}
+					}
+					for (j = 1; j <= lParam; j++) {
+						if (j == 1) {
+							aParams[i]=aParam[j];
+						} else {
+							aParams[i]=aParams[i] " " aParam[j];
+						}
+					}
+				}
+			
 				if (i == 1) {
 					Params=convertSimpleType(aParams[i]);
 				} else {
 					Params=Params ", " convertSimpleType(aParams[i]);
 				}
+				
 			}
+			
 		}
 		
-		postParams=substr($0,index($0,")")+1) 
+		postParams=substr($0,rindex($0,")")+1) 
 		# handle type def of functions and properties
 		lpostParams=split(postParams, apostParams , " ")
 		if (lpostParams > 0) {
@@ -543,6 +575,23 @@ function convertSimpleType(Param)
 		delete apostParams;
 		lpreParams="";
 		delete apreParams;
+	}
+	else {
+		# convert arrays
+		
+		$0=convertSimpleType($0);
+		
+		lLine=split($0, aLine , " ")
+		for (j = 1; j <= lLine; j++) {
+			if (match(aLine[j], ".*[(].*[)].*")) {
+				aLine[j]=gensub("[(].*[)]","","g",aLine[j]);
+				aLine[j-1]=aLine[j-1]"\[\]";
+			}
+		}
+		$0 = "";
+		for (j = 1; j <= lLine; j++) {
+			$0 = $0 aLine[j] " ";
+		}
 	}
 }
 
