@@ -36,7 +36,7 @@ Attribute VB_Exposed = False
     ''' readonly property
     ''' </summary>
     ''' <value>integer value</value>
-    ''' <returns>same interger value</returns>
+    ''' <returns>some interger value</returns>
     Public Property Get IntegerProperty() As String
             IntegerProperty = someString
     End Property
@@ -51,6 +51,18 @@ Attribute VB_Exposed = False
         SampleFunction = pFirst
     End Function
 
+	
+    ''' <summary>
+    ''' function with array parameter
+    ''' </summary>
+    ''' <param name="arg1">simple long parameter</param>
+    ''' <param name="arg2">String array</param>
+    ''' <returns>some long value</returns>
+    ''' <remarks></remarks>
+	Public Function SampleFunction2(arg1 As Long, arg2() As String) As Long
+
+    End Function
+	
     ''' <summary>
     ''' simple method
     ''' </summary>
@@ -63,7 +75,7 @@ Attribute VB_Exposed = False
     ''' method with parameters
     ''' </summary>
     ''' <param name="pFirst">simple param</param>
-    ''' <param name="pPointer">pinter</param>
+    ''' <param name="pPointer">pointer</param>
     ''' <remarks></remarks>
     Public Sub SampleMethodWithParams(ByVal pFirst As String, ByRef pPointer As Integer)
 
@@ -75,8 +87,8 @@ Attribute VB_Exposed = False
     ''' <param name="pSomeString">simple param</param>
     ''' <remarks></remarks>
     Private Sub Class_Initialize(ByVal pSomeString As String)
-     someString = pSomeString
-  End Sub
+        someString = pSomeString
+    End Sub
 
 
     ''' <summary>
