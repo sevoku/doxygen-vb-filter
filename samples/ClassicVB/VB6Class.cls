@@ -37,8 +37,8 @@ Attribute VB_Exposed = False
     ''' </summary>
     ''' <value>integer value</value>
     ''' <returns>some interger value</returns>
-    Public Property Get IntegerProperty() As String
-            IntegerProperty = someString
+    Public Property Get IntegerProperty() As Integer
+            IntegerProperty = someInteger
     End Property
 
     ''' <summary>
@@ -50,16 +50,25 @@ Attribute VB_Exposed = False
     Public Function SampleFunction(ByVal pFirst As Double) As Double
         SampleFunction = pFirst
     End Function
-
 	
     ''' <summary>
-    ''' function with array parameter
+    ''' function with an array as parameter
     ''' </summary>
     ''' <param name="arg1">simple long parameter</param>
     ''' <param name="arg2">String array</param>
     ''' <returns>some long value</returns>
     ''' <remarks></remarks>
 	Public Function SampleFunction2(arg1 As Long, arg2() As String) As Long
+
+    End Function
+	
+    ''' <summary>
+    ''' function with an array as result
+    ''' </summary>
+    ''' <param name="arg1">simple long parameter</param>
+    ''' <returns>long array</returns>
+    ''' <remarks></remarks>
+	Public Function SampleFunction3(arg1 As Long) As Long()
 
     End Function
 	

@@ -117,6 +117,16 @@ Public Class SampleClass
     End Function
 
     ''' <summary>
+    ''' function with arrays
+    ''' </summary>
+    ''' <param name="pFirst">double array as parameter</param>
+    ''' <returns>double array</returns>
+    ''' <remarks></remarks>
+    Public Function SampleFunction2(ByVal pFirst As Double()) As Double()
+
+    End Function
+
+    ''' <summary>
     ''' simple operator
     ''' </summary>
     ''' <param name="Obj1">first simple object</param>
