@@ -2,7 +2,7 @@
 # vbfilter.awk - doxygen VB .NET filter script - v2.3
 #
 # Creation:     26.05.2010  Vsevolod Kukol
-# Last Update:  30.05.2011  Vsevolod Kukol
+# Last Update:  31.05.2011  Vsevolod Kukol
 #
 # Copyright (c) 2010-2011 Vsevolod Kukol, sevo(at)sevo(dot)org
 #
@@ -478,6 +478,14 @@ function rindex(string, find) {
 	return 0;
 }
 
+function findEndArgs(string) {
+	ns=length(string);
+	nf=length(")");
+	for (r = ns + 1 - nf; r>=1; r--)
+		if ((substr(string, r, nf) == ")") && (substr(string, r - 1, nf) != "("))
+			return r;
+	return 0;
+}
 
 #(/.*Function[[:blank:]]+/ ||
 #/.*Sub[[:blank:]]+/ ||
@@ -502,11 +510,7 @@ function rindex(string, find) {
 		preParams=substr($0,0,index($0,"(")-1) 
 		lpreParams=split(preParams, apreParams , " ")
 		
-		Params=substr($0,index($0,"(")+1,rindex($0,")")-index($0,"(")-1)
-		
-		#if (! match(Params, ".*As.+") & ! match($0, " ) {
-		#	print "No Array";
-		#} else { print "ARRAY!"; }
+		Params=substr($0,index($0,"(")+1,findEndArgs($0)-index($0,"(")-1)
 		
 		lParams=split(Params, aParams, ",")
 		Params="";
@@ -538,16 +542,21 @@ function rindex(string, find) {
 				} else {
 					Params=Params ", " convertSimpleType(aParams[i]);
 				}
-				
 			}
-			
-		}
+			postParams=substr($0,findEndArgs($0)+1)
+		} else { 
+			postParams=substr($0,rindex($0, ")")+1) }
 		
-		postParams=substr($0,rindex($0,")")+1) 
+		#postParams=substr($0,findEndArgs($0)+1) 
 		# handle type def of functions and properties
 		lpostParams=split(postParams, apostParams , " ")
 		if (lpostParams > 0) {
 			if (apostParams[1] == "As") {
+				## functions with array as result
+				if (match(apostParams[2], ".*[(].*[)].*")) {
+					apostParams[2]=gensub("[(].*[)]","\[\]","g",apostParams[2]);
+				}
+				##
 				apreParams[lpreParams+1]=apreParams[lpreParams];
 				apreParams[lpreParams]=apostParams[2];
 				lpreParams++;
