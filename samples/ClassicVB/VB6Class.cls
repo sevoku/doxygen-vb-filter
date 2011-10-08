@@ -19,17 +19,18 @@ Attribute VB_Exposed = False
     
     Private someInteger As Integer ' simple private integer value
     Public someString As String    ' simple public string value
+    Private someObject As Object   ' some object
 
     ''' <summary>
     ''' simple property
     ''' </summary>
     ''' <value>some string</value>
     ''' <returns>some string</returns>
+    Public Property Let StringProperty(value As String)
+            someString = value
+    End Property
     Public Property Get StringProperty() As String
             StringProperty = someString
-    End Property
-    Public Property Set StringProperty(ByVal value As String)
-            someString = value
     End Property
 
     ''' <summary>
@@ -39,6 +40,32 @@ Attribute VB_Exposed = False
     ''' <returns>some interger value</returns>
     Public Property Get IntegerProperty() As Integer
             IntegerProperty = someInteger
+    End Property
+
+    ''' <summary>
+    ''' reference property
+    ''' </summary>
+    ''' <value>some object</value>
+    ''' <returns>some object</returns>
+    Public Property Set ObjectProperty(value As Object)
+            Set someObject = value
+    End Property
+    Public Property Get ObjectProperty() As Object
+            ObjectProperty = someObject
+    End Property
+
+    ''' <summary>
+    ''' not working property
+    ''' </summary>
+    ''' <remarks>
+    ''' this property will be seen as ReadOnly by the Doxygen vbfilter
+    ''' because Set does not preceed get!
+    ''' </remarks>
+    Public Property Get TestProperty() As Object
+            ObjectProperty = someObject
+    End Property
+    Public Property Set TestProperty(value As Object)
+            Set someObject = value
     End Property
 
     ''' <summary>

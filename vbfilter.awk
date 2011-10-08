@@ -63,6 +63,7 @@ BEGIN{
 	insideNamespace=0;
 	insideComment=0;
 	insideImports=0;
+	instideVB6Property=0;
 	isInherited=0;
 	lastLine="";
 	appShift="";
@@ -717,9 +718,6 @@ isInherited==1{
 #############################################################################
 # Properties
 #############################################################################
-# skip VB6 Set/Let Property methods
-/.*Property[[:blank:]]+Set[[:blank:]]+/ ||
-/.*Property[[:blank:]]+Let[[:blank:]]+/ { next; }
 
 /^Property[[:blank:]]+/ ||
 /.*[[:blank:]]+Property[[:blank:]]+/ {
@@ -731,16 +729,34 @@ isInherited==1{
 	} else {
 		$0=gensub("[(][)]","","g");
 	}
+	
 	# add c# styled get/set methods
-	if (match($0,"ReadOnly")) {
+	if ((match($0,"ReadOnly")) || (match($0,"Get"))) {
 		#sub("ReadOnly[[:blank:]]","");
-		$0=$0 "\n" appShift "{ get { }; }";
+		if (instideVB6Property == 1)
+		{
+			instideVB6Property = 0;
+			$0=gensub(" Get| Set| Let","","g");
+			print appShift $0 "\n" appShift "{ get; set; }";
+		}
+		else
+		{
+			$0=gensub(" Get| Set| Let","","g");
+			print appShift $0 "\n" appShift "{ get; }";
+		}
 	} else {
-		$0=$0 "\n" appShift "{ get{ }; set{ }; }";
+		if ((match($0, "Let") || match($0, "Set"))) {
+			instideVB6Property = 1;
+			next;
+		}
+			$0=gensub(" Get| Set| Let","","g");
+		print appShift $0 "\n" appShift "{ get; set; }";
+		next;
 	}
-	print appShift $0;
+	instideVB6Property = 0;
 	next;
 }
+
 
 /.*Operator[[:blank:]]+/ {
 	$0=gensub("Operator[[:blank:]]+([^ ]+)[[:blank:]]+","\\1 operator ","g",$0);
