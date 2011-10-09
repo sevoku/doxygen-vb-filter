@@ -1,8 +1,8 @@
 #----------------------------------------------------------------------------
-# vbfilter.awk - doxygen VB .NET filter script - v2.3
+# vbfilter.awk - doxygen VB .NET filter script - v2.4
 #
 # Creation:     26.05.2010  Vsevolod Kukol
-# Last Update:  31.05.2011  Vsevolod Kukol
+# Last Update:  09.10.2011  Vsevolod Kukol
 #
 # Copyright (c) 2010-2011 Vsevolod Kukol, sevo(at)sevo(dot)org
 #
@@ -48,6 +48,14 @@ BEGIN{
 	# but doxygen should recognize package names.
 	# in C# unlike in VB .NET a namespace must always be defined
 	leadingNamespace=1;
+	
+	# per default the parser converts all keywords to their C# equivalents:
+	# Function -> function
+	# Sub -> void
+	# ....
+	# Set csharpStyledOutput=0 to keep the VB style in the resulting 
+	# documentation.
+	csharpStyledOutput=1;
 	
 #############################################################################
 # helper variables, don't change
@@ -205,9 +213,9 @@ printedFilename==0 {
 	printedFilename=1;
 	file=gensub(/\\/, "/", "G", FILENAME)
 		if (insideVB6Class!=1) {
-			print "/// @file "basename[split(file, basename , "/")]"\n";
+			print "/// @file \n";
 		} else {
-			print "/**\n * @file "basename[split(file, basename , "/")];
+			print "/**\n * @file \n";
 			print " * \\brief Single VB6 class module, defining " insideVB6ClassName;
 			print " */";
 			if (leadingNamespace==1) {	# leading namespace enabled?
@@ -238,7 +246,7 @@ printedFilename==0 {
 }
 
 #############################################################################
-# print leading namespace after the using section (if presend)
+# print leading namespace after the using section (if present)
 # or after the file header.
 # namespace name is extracted from file path. the last directory name in
 # the path, usually the project folder, is used.
@@ -251,7 +259,7 @@ printedFilename==0 {
 		if (insideVB6Class!=1) {
 			file=gensub(/\\/, "/", "G", FILENAME)
 			# get project name from the file path
-			print "namespace "basename[split(file, basename , "/")-1]" {";
+			print "namespace "gensub(/ /,"_","G",basename[split(file, basename , "/")-1])" {";
 			AddShift()
 		}
 		leadingNamespace=2;	# is checked by the END function to print corresponding "}"
@@ -350,6 +358,9 @@ printedFilename==0 {
 #############################################################################
 # simple rewrites
 # vb -> c# style
+# 
+# keywords used by doxygen must be rewritten. All other rewrites
+# are optional and depend on the csharpStyledOutput setting.
 #############################################################################
 /^.*Private[[:blank:]]+/ {
 	sub("Private[[:blank:]]+","private ");
@@ -361,16 +372,113 @@ printedFilename==0 {
 # so make it private to get it recognized by Doxygen) and Friend appear
 # in Documentation
 /^.*Friend[[:blank:]]+/ {
-	sub("Friend[[:blank:]]+","private Friend ");
+	if (csharpStyledOutput==1)
+		sub("Friend[[:blank:]]+","private Friend ");
+	else {
+		print appShift"/// \\remark declared as Friend in the VB original source"
+		sub("Friend[[:blank:]]+","private ");
+	}
 }
+
 /^.*Protected[[:blank:]]+/ {
 	sub("Protected[[:blank:]]+","protected ");
 }
-# add "static" to all Shared members
+
 /^.*Shared[[:blank:]]+/ {
-	sub("Shared", "static Shared");
+	if (csharpStyledOutput==1)
+		sub("Shared", "static");
+	else 
+		sub("Shared", "static Shared");
+}
+# Replace "Partial" by "partial" and swap order of "partial" and "public" or "private"
+/^.*Partial[[:blank:]]+/ {
+	sub("Partial","partial");
+	if($1 == "partial" && $2 ~ /public|private/) {
+		$1 = $2;
+		$2 = "partial";
+	}	
 }
 
+# Const -> const
+/\<Const\>/ {
+	gsub(/\<Const\>/,"const");
+}
+
+# No WithEvents in C# - let's treat it like variables
+/^.*WithEvents[[:blank:]]+/ && (csharpStyledOutput==1) {
+	sub("WithEvents","");
+}
+
+# Overrides -> override
+/[[:blank:]]Overrides[[:blank:]]/ && (csharpStyledOutput==1) {
+	sub("Overrides","override");
+}
+
+# Overridable -> virtual
+/[[:blank:]]Overridable[[:blank:]]/ && (csharpStyledOutput==1) {
+	sub("Overridable","virtual");
+}
+
+# Optional has to be removed for c# style
+/[[:blank:]]Optional[[:blank:]]/ && (csharpStyledOutput==1) {
+	gsub("Optional"," ");
+}
+
+/\<String\>/ && (csharpStyledOutput==1) {
+	gsub(/\<String\>/,"string");
+}
+
+/\<Boolean\>/ && (csharpStyledOutput==1) {
+	gsub(/\<Boolean\>/,"bool");
+}
+
+/\<Char\>/ && (csharpStyledOutput==1) {
+	gsub(/\<Char\>/,"char");
+}
+
+/\<Byte\>/ && (csharpStyledOutput==1) {
+	gsub(/\<Byte\>/,"byte");
+}
+
+/\<Short\>/ && (csharpStyledOutput==1) {
+	gsub(/\<Short\>/,"short");
+}
+
+/\<Integer\>/ && (csharpStyledOutput==1) {
+	gsub(/\<Integer\>/,"int");
+}
+
+/\<Long\>/ && (csharpStyledOutput==1) {
+	gsub(/\<Long\>/,"long");
+}
+
+/\<Single\>/ && (csharpStyledOutput==1) {
+	gsub(/\<Single\>/,"float");
+}
+
+/\<Double\>/ && (csharpStyledOutput==1) {
+	gsub(/\<Double\>/,"double");
+}
+
+/\<Decimal\>/ && (csharpStyledOutput==1) {
+	gsub(/\<Decimal\>/,"decimal");
+}
+
+/\<Date\>/ && (csharpStyledOutput==1) {
+	gsub(/\<Date\>/,"DateTime");
+}
+
+/\<Object\>/ && (csharpStyledOutput==1) {
+	gsub(/\<Object\>/,"object");
+}
+
+/\<Delegate\>/ && (csharpStyledOutput==1) {
+	gsub(/\<Delegate\>/,"delegate");
+}
+
+/\<AddressOf\>/ && (csharpStyledOutput==1) {
+	gsub(/\<AddressOf\>/,"\\&");
+}
 
 #############################################################################
 # Enums
@@ -423,6 +531,8 @@ insideEnum==1 {
 	libName=gensub(".+Lib[[:blank:]]+\"([^ ]*)\"[[:blank:]].*","\\1","g");
 	if (match($0,"Alias")>0) aliasName=gensub(".+Alias[[:blank:]]+\"([^ ]*)\"[[:blank:]].*"," (Alias: \\1)","g");
 	print appShift "/** Is imported from extern library: " libName aliasName " */";
+	if (csharpStyledOutput==1)
+		sub(/Declare[[:blank:]]+/,"extern ");
 	libName="";
 	aliasName="";
 }
@@ -440,20 +550,26 @@ insideEnum==1 {
 #############################################################################
 
 /.*[(]Of[ ][^ ]+[)].*/ {
-	$0=gensub("[(]Of[ ]([^ ]+)[)]", "<\\1>","g",$0);
+	$0=gensub("[(]Of[ ]([^ )]+)[)]", "<\\1>","g",$0);
 }
 
 ## converts a single type definition to c#
 ##  "Var As Type" -> "Type Var"
+##  "Var As New Type" -> "Type Var = new Type()"
 function convertSimpleType(Param)
 {
 	l=split(Param, aParam, " ")
 	newParam="";
 	for (j = 1; j <= l; j++) {
 		if (aParam[j] == "As") {			
+			typeIndex = 1;
+			if (aParam[j+1] == "New") {
+				typeIndex = 2;
+				aParam[j+1] = "";
+			}
 			aParam[j]=aParam[j-1];
-			aParam[j-1]=aParam[j+1];
-			aParam[j+1]="";
+			aParam[j-1]=aParam[j+typeIndex];
+			aParam[j+typeIndex]="";
 		}
 	}
 	for (j = 1; j <= l; j++) {
@@ -482,9 +598,11 @@ function rindex(string, find) {
 function findEndArgs(string) {
 	ns=length(string);
 	nf=length(")");
-	for (r = ns + 1 - nf; r>=1; r--)
-		if ((substr(string, r, nf) == ")") && (substr(string, r - 1, nf) != "("))
+	for (r = ns + 1 - nf; r>=1; r--) {
+		if ((substr(string, r, nf) == ")") && (substr(string, r - 1, nf) != "(")) {
 			return r;
+		}
+	}
 	return 0;
 }
 
@@ -496,7 +614,9 @@ function findEndArgs(string) {
 /.*As[[:blank:]]+/ {
 	gsub("ByVal","");
 	# keep ByRef to make pointers differ from others
-	#gsub("ByRef","");
+	# gsub("ByRef","");
+	if (csharpStyledOutput==1)
+		gsub("ByRef","ref");
 	
 	# simple member definition without brackets
 	if (index($0,"(") == 0) {
@@ -526,7 +646,7 @@ function findEndArgs(string) {
 						if (aParam[j] == "As") {
 							aParam[j-1]=gensub("[(][)]","","g",aParam[j-1]);
 							aParam[j+1]=gensub("[(][)]","","g",aParam[j+1]);
-							aParam[j+1]=aParam[j+1]"\[\]";
+							aParam[j+1]=aParam[j+1]"[]";
 						}
 					}
 					for (j = 1; j <= lParam; j++) {
@@ -546,8 +666,8 @@ function findEndArgs(string) {
 			}
 			postParams=substr($0,findEndArgs($0)+1)
 		} else { 
-			postParams=substr($0,rindex($0, ")")+1) }
-		
+			postParams=substr($0,rindex($0, ")")+1)
+		}
 		#postParams=substr($0,findEndArgs($0)+1) 
 		# handle type def of functions and properties
 		lpostParams=split(postParams, apostParams , " ")
@@ -555,7 +675,7 @@ function findEndArgs(string) {
 			if (apostParams[1] == "As") {
 				## functions with array as result
 				if (match(apostParams[2], ".*[(].*[)].*")) {
-					apostParams[2]=gensub("[(].*[)]","\[\]","g",apostParams[2]);
+					apostParams[2]=gensub("[(].*[)]","[]","g",apostParams[2]);
 				}
 				##
 				apreParams[lpreParams+1]=apreParams[lpreParams];
@@ -571,9 +691,8 @@ function findEndArgs(string) {
 		for (i = 1; i <= lpreParams; i++) {
 			if (apreParams[i]!="")	$0=$0 apreParams[i]" ";
 		}
-		
+
 		$0=$0 "("Params") ";
-		
 		for (i = 1; i <= lpostParams; i++) {
 			if (apostParams[i]!="")	$0=$0 apostParams[i]" ";
 		}
@@ -588,14 +707,13 @@ function findEndArgs(string) {
 	}
 	else {
 		# convert arrays
-		
 		$0=convertSimpleType($0);
 		
 		lLine=split($0, aLine , " ")
 		for (j = 1; j <= lLine; j++) {
 			if (match(aLine[j], ".*[(].*[)].*")) {
 				aLine[j]=gensub("[(].*[)]","","g",aLine[j]);
-				aLine[j-1]=aLine[j-1]"\[\]";
+				aLine[j-1]=aLine[j-1]"[]";
 			}
 		}
 		$0 = "";
@@ -632,7 +750,8 @@ function findEndArgs(string) {
 /.*[[:blank:]]Class[[:blank:]]+/ ||
 /^Structure[[:blank:]]+/ ||
 /.*[[:blank:]]Structure[[:blank:]]+/ ||
-/^Type[[:blank:]]+/  {
+/^Type[[:blank:]]+/ ||
+/.*[[:blank:]]Type[[:blank:]]+/ {
 	sub("Interface","interface");
 	sub("Class","class");
 	sub("Structure","struct");
@@ -722,6 +841,13 @@ isInherited==1{
 /^Property[[:blank:]]+/ ||
 /.*[[:blank:]]+Property[[:blank:]]+/ {
 	sub("[(][)]","");
+
+	if (csharpStyledOutput==1)
+	{
+		# remove Property keyword
+		gsub("^Property[[:blank:]]","")	
+		gsub("[[:blank:]]Property[[:blank:]]"," ")
+	}
 	
 	if (match($0,"[(].+[)]")) {
 		$0=gensub("[(]","[","g");
@@ -732,11 +858,12 @@ isInherited==1{
 	
 	# add c# styled get/set methods
 	if ((match($0,"ReadOnly")) || (match($0,"Get"))) {
-		#sub("ReadOnly[[:blank:]]","");
+		if (csharpStyledOutput==1)
+			sub("ReadOnly[[:blank:]]","");
 		if (instideVB6Property == 1)
 		{
 			instideVB6Property = 0;
-			$0=gensub(" Get| Set| Let","","g");
+			$0=gensub("[[:blank:]]Get|[[:blank:]]Set|[[:blank:]]Let","","g");
 			print appShift $0 "\n" appShift "{ get; set; }";
 		}
 		else
@@ -769,15 +896,16 @@ isInherited==1{
 /.*public[[:blank:]]+/ ||
 /.*protected[[:blank:]]+/ ||
 /.*friend[[:blank:]]+/ ||
+/.*internal[[:blank:]]+/ ||
 /^Sub[[:blank:]]+/ ||
 /.*[[:blank:]]+Sub[[:blank:]]+/ ||
 /^Function[[:blank:]]+/ ||
 /.*[[:blank:]]+Function[[:blank:]]+/ ||
-/.*Declare[[:blank:]]+/ ||
+/.*declare[[:blank:]]+/ ||
 /^Event[[:blank:]]+/ ||
 /.*[[:blank:]]+Event[[:blank:]]+/ ||
-/.*Const[[:blank:]]+/ ||
-/.*[[:blank:]]+Const[[:blank:]]+/ {
+/.*const[[:blank:]]+/ ||
+/.*[[:blank:]]+const[[:blank:]]+/ {
 		
 	# remove square brackets from reserved names
 	# but do not match array brackets
@@ -785,16 +913,28 @@ isInherited==1{
 	#  "[Stop]" is replaced by "Stop"	
 	$0=gensub("([^[])([\\]])","\\1","g"); 
 	$0=gensub("([[])([^\\]])","\\2","g"); 
+
+	if (csharpStyledOutput==1)
+	{
+		# subs are functions returning void
+		gsub("[[:blank:]]Sub[[:blank:]]+"," void ");
+		gsub("^Sub[[:blank:]]+","void ");
+		gsub("[[:blank:]]Event[[:blank:]]+"," event ");
+		gsub("^Event[[:blank:]]+","event ");
+	}
 	
 	# add semicolon before inline comment
 	if( $0 != "" ){	
 		commentPart=substr($0,index($0,"/"));
 		definitionPart=substr($0,0,index($0,"/")-1);
 		if ( definitionPart != "" && commentPart != "") {
-			print appShift definitionPart"; "commentPart
+			$0 = appShift definitionPart"; "commentPart
 		} else {
-			print appShift $0";";
+			$0 = appShift $0";";
 		}
+		# with Declares we can have a superfluous "Function" here.
+		sub("Function","");		
+		print $0
 	}
 }
 

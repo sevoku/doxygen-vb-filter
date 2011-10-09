@@ -12,8 +12,8 @@
 ' <A HREF="http://trac.sevo.org/projects/doxyvb/browser/trunk/samples/">http://trac.sevo.org/projects/doxyvb/browser/trunk/samples/</A>
 '
 ' \author Vsevolod Kukol
-' \version 2.3.1
-' \date    31.05.2011
+' \version 2.4.0
+' \date    09.10.2011
 '
 ' \dir samples contains example files demostrating the Doxygen VB filter functionality
 ' \package DotNET <summary>contains example classes demostrating VB.NET filter functionality</summary>

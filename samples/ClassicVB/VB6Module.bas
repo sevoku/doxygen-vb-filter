@@ -7,8 +7,8 @@ Attribute VB_Name = "VB6Module"
 ' </summary>
 Public Type SampleVB6Type
 
-    Public someInteger As Integer ' simple private integer value
-    Public someString As String   ' simple public string value
+    Private someInteger As Integer ' simple private integer value
+    Public someString As String    ' simple public string value
 
 End Type
 
