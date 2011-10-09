@@ -14,5 +14,5 @@ rem | (at your option) any later version.
 rem |-----------------------------------------------------------------------------
 
 rem run Doxygen
-doxygen %~dp0\Doxyfile.windows
+doxygen "%~dp0\Doxyfile.windows"
 

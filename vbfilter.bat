@@ -26,4 +26,4 @@ rem | the Free Software Foundation; either version 2 of the License, or
 rem | (at your option) any later version.
 rem |-----------------------------------------------------------------------------
 
-%~dp0\gawk.exe -f %~dp0\vbfilter.awk %*%
+"%~dp0\gawk.exe" -f "%~dp0\vbfilter.awk" %*%
