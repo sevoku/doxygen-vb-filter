@@ -1,5 +1,5 @@
 #----------------------------------------------------------------------------
-# vbfilter.awk - doxygen VB .NET filter script - v2.4
+# vbfilter.awk - doxygen VB .NET filter script - v2.4.1
 #
 # Creation:     26.05.2010  Vsevolod Kukol
 # Last Update:  09.10.2011  Vsevolod Kukol
@@ -63,11 +63,11 @@ BEGIN{
 	printedFilename=0;
 	fileHeader=0;
 	fullLine=1;
-	insideClass=0;
+	classNestCounter=0;
+	className[1]="";
 	insideVB6Class=0;
 	insideVB6ClassName="";
 	insideVB6Header=0;
-	insideSubClass=0;
 	insideNamespace=0;
 	insideComment=0;
 	insideImports=0;
@@ -298,11 +298,7 @@ printedFilename==0 {
 		# class/interface declaration
 		
 		if (isInherited==1){
-			isInherited=0;
-			if (lastLine!="") print appShift lastLine;
-			print appShift "{"
-			AddShift()
-			lastLine="";
+			endOfInheritance();
 		}
 		print appShift "/**"
 	}
@@ -724,6 +720,16 @@ function findEndArgs(string) {
 }
 
 #############################################################################
+# Rewrite Subs handling events if csharpStyledOutput=1
+#############################################################################
+
+/.*[[:blank:]]Handles[[:blank:]]+/ && (csharpStyledOutput==1) {
+	name=gensub(/(.*)[[:blank:]]+Handles[[:blank:]]+(\w+)/,"\\2","g",$0);
+	print appShift "/// \\remark Handles the " name " event.";
+	$0=  gensub(/(.*)[[:blank:]]+Handles[[:blank:]]+(.*)/,"\\1","g",$0);
+}
+		
+#############################################################################
 # namespaces
 #############################################################################
 /^Namespace[[:blank:]]+/ || /[[:blank:]]+Namespace[[:blank:]]+/ {
@@ -756,27 +762,32 @@ function findEndArgs(string) {
 	sub("Class","class");
 	sub("Structure","struct");
 	sub("Type","struct");
-	
-	# handle subclasses
-	if (insideClass==1) {
-		insideSubClass=1;
-	} else {
-		insideClass=1;
+	if(isInherited) {
+		endOfInheritance();
 	}
+	classNestCounter++;
 	
 	# save class name for constructor handling
-	className=gensub(".+class[[:blank:]]+([^ ]*).*","\\1","g");
-	
+	className[classNestCounter]=gensub(".+class[[:blank:]]+([^ ]*).*","\\1","g");
 	isInherited=1;
 	print appShift $0;
 	next;
 }
 
 # handle constructors
-/.*Sub[[:blank:]]+New.*/ && className!="" {
-	sub("New", "New " className);
+/.*Sub[[:blank:]]+New.*/ && className[classNestCount]!="" {
+	sub("New", "New " className[classNestCount]);
 }
 
+function endOfInheritance()
+{
+		isInherited=0;
+		if (lastLine!="") print appShift lastLine;
+		print appShift "{";
+		AddShift();
+		lastLine="";
+		return 0;
+}
 
 # handle inheritance
 isInherited==1{
@@ -796,11 +807,7 @@ isInherited==1{
 		}
 	}
 	else {
-		isInherited=0;
-		if (lastLine!="") print appShift lastLine;
-		print appShift "{";
-		AddShift();
-		lastLine="";
+		endOfInheritance();
 	}
 }
 
@@ -808,15 +815,10 @@ isInherited==1{
  /.*End[[:blank:]]+Class.*/ ||
  /.*End[[:blank:]]+Structure/ ||
  /.*End[[:blank:]]+Type/) &&
- (insideClass==1 || insideSubClass==1){
-	if (insideSubClass==1) {
-		insideSubClass=0;
-	} else {
-		insideClass=0;
-	}
+ (classNestCounter >= 1){
 	ReduceShift();
 	print appShift "}";
-	className="";
+	delete className[classNestCounter+1];
 	next;
 }
 

@@ -124,8 +124,10 @@ Instructions
 		  to the folder CONTAINING the Doc folder
 		  (in most cases your Project or Solution folder!)
 
+5. open vbfilter.awk in your favorite editor and edit the options in
+   the Configuration section as you like.
 
-5. run Doc\make.bat or Doc/make.sh to generate the documentation.
+6. run Doc\make.bat or Doc/make.sh to generate the documentation.
 
 
 Good to know

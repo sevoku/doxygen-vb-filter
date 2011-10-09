@@ -76,10 +76,27 @@ End Interface
 Public Class SampleClass
     Implements ISample
 
+	''' <summary>
+	''' nested class declared inside SampleClass
+	''' </summary>
+    Public Class NestedClass
+    	Inherits Object
+    	Public someString As String    ' simple public string value
+
+	    ''' <summary>
+	    ''' some event
+	    ''' </summary>
+	    ''' <param name="Sender">sender of object type</param>
+	    ''' <param name="args">event arguments</param>
+	    ''' <remarks></remarks>
+	    Public Event SomeEvent(ByVal Sender As Object, ByVal args As EventArgs)
+
+    End Class
+
     Private someInteger As Integer ' simple private integer value
     Public longArray() As Long     ' long array
     Public someString As String    ' simple public string value
-	
+    Public nestedClassObject As New NestedClass  ' NestedClass instance
 
     ''' <summary>
     ''' simple property
@@ -171,6 +188,14 @@ Public Class SampleClass
     Public Sub MethodWithArrayParams(ByVal pArr() As Integer, ByVal pArg As Integer)
 
     End Sub
+	
+    ''' <summary>
+    ''' method handles event from nested class
+    ''' </summary>
+    Public Sub nestedClassObject_OnSomeEvent(ByVal Sender As Object, ByVal args As EventArgs) Handles nestedClassObject.SomeEvent
+
+    End Sub
+
 
     ''' <summary>
     ''' some event
