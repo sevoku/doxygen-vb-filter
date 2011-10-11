@@ -757,7 +757,7 @@ function findEndArgs(string) {
 /^Structure[[:blank:]]+/ ||
 /.*[[:blank:]]Structure[[:blank:]]+/ ||
 /^Type[[:blank:]]+/ ||
-/.*[[:blank:]]Type[[:blank:]]+/ {
+/(friend|protected|private|public).*[[:blank:]]+Type[[:blank:]]+/ {
 	sub("Interface","interface");
 	sub("Class","class");
 	sub("Structure","struct");
