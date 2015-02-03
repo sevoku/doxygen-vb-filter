@@ -28,6 +28,8 @@ A complete documentation can be found in the [GitHub Project Wiki](https://githu
 * [Environment Setup](https://github.com/sevoku/doxygen-vb-filter/wiki/Environment-Setup)
 * [Filter configuration](https://github.com/sevoku/doxygen-vb-filter/wiki/Filter-configuration)
 * [Documenting your sources](https://github.com/sevoku/doxygen-vb-filter/wiki/Documenting-your-sources)
+* [Generating Documentation](https://github.com/sevoku/doxygen-vb-filter/wiki/Generating-Documentation)
+* [Advanced Installation](https://github.com/sevoku/doxygen-vb-filter/wiki/Advanced-Installation)
 
 ##License
 Copyright (c) 2010-2015 Vsevolod Kukol, sevo(at)sevo(dot)org
