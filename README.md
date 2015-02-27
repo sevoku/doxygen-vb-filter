@@ -9,7 +9,7 @@ by Mathias Henze. More information about his script can be found in
 the [Helper Tools section](http://www.stack.nl/~dimitri/doxygen/helpers.html#doxfilt_vb) on the Doxygen homepage. 
 
 
-##How dows it work
+##How does it work
 
 Doxygen can preprocess all sources using a source filter. A source filter
 must be executable, accept the name of the source path as last parameter
