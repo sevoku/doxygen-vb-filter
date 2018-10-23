@@ -100,7 +100,7 @@ Instructions
          For VB-NET: "= .vb=csharp"
             For VB6: "= .cls=csharp .frm=csharp .ctl=csharp .bas=csharp"
 
-   INPUT: full path to the sopurces (usually the folder containing `Doc`),
+   INPUT: full path to the sources (usually the folder containing `Doc`),
           or simply `.` in order to use the `make.[bat|sh]` scripts.
 
    FILE_PATTERNS:
@@ -161,5 +161,5 @@ Other formats
 HTML output is enabled by default. You can additionally enable
 RTF, LaTex and some other output formats. LaTex and PDF need
 a complete LaText distribution to be installed. Read the
-Doxygen manula for more information.
+Doxygen manual for more information.
 
