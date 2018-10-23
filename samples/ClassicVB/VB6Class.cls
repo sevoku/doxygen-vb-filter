@@ -37,7 +37,7 @@ Attribute VB_Exposed = False
     ''' readonly property
     ''' </summary>
     ''' <value>integer value</value>
-    ''' <returns>some interger value</returns>
+    ''' <returns>some integer value</returns>
     Public Property Get IntegerProperty() As Integer
             IntegerProperty = someInteger
     End Property
@@ -59,7 +59,7 @@ Attribute VB_Exposed = False
     ''' </summary>
     ''' <remarks>
     ''' this property will be seen as ReadOnly by the Doxygen vbfilter
-    ''' because Set does not preceed get!
+    ''' because Set does not precede get!
     ''' </remarks>
     Public Property Get TestProperty() As Object
             ObjectProperty = someObject
