@@ -134,12 +134,11 @@ fullLine==0{
 	next;
 }
 
-
 #############################################################################
 # VB6 file headers including class definitions
 #############################################################################
 
-# if file begins with a class definition, swith to VB6 mode
+# if file begins with a class definition, switch to VB6 mode
 /.*[[:blank:]]+CLASS/ ||
 /.*[[:blank:]]+VB\.Form[[:blank:]]+/ ||
 /.*[[:blank:]]+VB\.UserControl[[:blank:]]+/ {
@@ -282,8 +281,6 @@ printedFilename==0 {
 	}
 }
 
-
-
 #############################################################################
 # handle comments
 #############################################################################
@@ -369,9 +366,11 @@ printedFilename==0 {
 /^.*Private[[:blank:]]+/ {
 	sub("Private[[:blank:]]+","private ");
 }
+
 /^.*Public[[:blank:]]+/ {
 	sub("Public[[:blank:]]+","public ");
 }
+
 # friend is the same as internal in c#, but Doxygen doesn't support internal,
 # so make it private to get it recognized by Doxygen) and Friend appear
 # in Documentation
@@ -394,6 +393,7 @@ printedFilename==0 {
 	else 
 		sub("Shared", "static Shared");
 }
+
 # Replace "Partial" by "partial" and swap order of "partial" and "public" or "private"
 /^.*Partial[[:blank:]]+/ {
 	sub("Partial","partial");
@@ -546,8 +546,6 @@ insideEnum==1 {
 	sub("Lib[[:blank:]]+[^[:blank:]]+","");
 	sub("Alias[[:blank:]]+[^[:blank:]]+","");
 }
-
-
 
 #############################################################################
 # types (handle As and Of)
@@ -730,7 +728,6 @@ function findEndArgs(string) {
 #############################################################################
 # Rewrite Subs handling events if csharpStyledOutput=1
 #############################################################################
-
 /.*[[:blank:]]Handles[[:blank:]]+/ && (csharpStyledOutput==1) {
 	name=gensub(/(.*)[[:blank:]]+Handles[[:blank:]]+(\w+)/,"\\2","g",$0);
 	print appShift "/// \\remark Handles the " name " event.";
@@ -830,7 +827,6 @@ isInherited==1{
 	next;
 }
 
-
 #############################################################################
 # Replace Implements with a comment linking to the interface member,
 #   since Doxygen does not recognize members with names that differ
@@ -847,7 +843,6 @@ isInherited==1{
 #############################################################################
 # Properties
 #############################################################################
-
 /^Property[[:blank:]]+/ ||
 /.*[[:blank:]]+Property[[:blank:]]+/ {
 	sub("[(][)]","");
@@ -893,7 +888,6 @@ isInherited==1{
 	instideVB6Property = 0;
 	next;
 }
-
 
 /.*Operator[[:blank:]]+/ {
 	$0=gensub("Operator[[:blank:]]+([^ ]+)[[:blank:]]+","\\1 operator ","g",$0);
