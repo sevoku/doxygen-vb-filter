@@ -89,6 +89,23 @@ function ReduceShift() {
 }
 
 #############################################################################
+# trim functions
+#############################################################################
+function rtrim(s) {
+	sub(/[ \t\r\n]+$/, "", s);
+	return s;
+}
+
+function ltrim(s) {
+	sub(/^[ \t\r\n]+/, "", s);
+	return s;
+}
+
+function trim(s) {
+	return rtrim(ltrim(s));
+}
+
+#############################################################################
 # apply dos2unix
 #############################################################################
 UnixLineBreaks==1{
@@ -689,10 +706,13 @@ function findEndArgs(string) {
 		for (i = 1; i <= lpreParams; i++) {
 			if (apreParams[i]!="")	$0=$0 apreParams[i]" ";
 		}
-
+		
+		$0=rtrim($0)
+		
 		$0=$0 "("Params") ";
+		
 		for (i = 1; i <= lpostParams; i++) {
-			if (apostParams[i]!="")	$0=$0 apostParams[i]" ";
+			if (apostParams[i]!="") $0=$0 apostParams[i]" ";
 		}
 		
 		# cleanup mem
