@@ -27,13 +27,19 @@ Private Enum SampleEnum2
 End Enum
 
 ' <summary>
-' simple VB6 Type
+' simple VB6 Structure
 ' </summary>
-Public Type SampleVB6Type
-
+Public Structure SampleVB6Structure
     Private someInteger As Integer ' simple private integer value
-    Public someString As String    ' simple public string value
+    Public someString As String ' simple public string value
+End Structure
 
+' <summary>
+' simple VBA/VB6 Type
+' </summary>
+Public Type SampleVBAType
+    someInteger As Integer ' simple integer value
+    someString As String ' simple string value
 End Type
 
 ' <summary>
@@ -53,5 +59,3 @@ End Function
 Sub SampleModuleMethod()
 
 End Sub
-
-
