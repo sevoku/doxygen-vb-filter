@@ -7,7 +7,8 @@ Attribute VB_Name = "VB6Module"
 ' </summary>
 Public Enum SampleEnum1
     [_First] = 1
-    First_Item = 1 'First enum item
+    ''' First enum item
+    First_Item = 1
     Second_Item = 2 'Second enum item
     Third_Item = 3 'Third enum item
     [_Last] = 3
@@ -19,7 +20,8 @@ End Enum
 Private Enum SampleEnum2
     [_First] = 1
     First_Item = 1 'First enum item
-    Second_Item = 2 'Second enum item
+    ''' Second emum item
+    Second_Item = 2
     Third_Item = 3 'Third enum item
     [_Last] = 3
 End Enum
