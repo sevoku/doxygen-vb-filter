@@ -715,6 +715,8 @@ function findEndArgs(string) {
 			if (apostParams[i]!="") $0=$0 apostParams[i]" ";
 		}
 		
+		$0=rtrim($0)
+		
 		# cleanup mem
 		lParams="";
 		delete aParams;
