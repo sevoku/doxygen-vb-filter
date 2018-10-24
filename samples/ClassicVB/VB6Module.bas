@@ -3,6 +3,28 @@ Attribute VB_Name = "VB6Module"
 ' <remarks>The original unfiltered source of this file: <A HREF="http://trac.sevo.org/projects/doxyvb/browser/trunk/samples/ClassicVB/VB6Module.bas">VB6Module.bas</A></remarks>
 
 ' <summary>
+' simple VB6 Public Enum
+' </summary>
+Public Enum SampleEnum1
+    [_First] = 1
+    First_Item = 1
+    Second_Item = 2
+    Third_Item = 3
+    [_Last] = 3
+End Enum
+
+' <summary>
+' simple VB6 Private Enum
+' </summary>
+Private Enum SampleEnum2
+    [_First] = 1
+    First_Item = 1
+    Second_Item = 2
+    Third_Item = 3
+    [_Last] = 3
+End Enum
+
+' <summary>
 ' simple VB6 Type
 ' </summary>
 Public Type SampleVB6Type
