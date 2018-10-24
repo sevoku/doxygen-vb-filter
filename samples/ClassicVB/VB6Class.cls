@@ -12,10 +12,10 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
     ''' <summary>
-    ''' VB6 class example'
+    ''' VB6 class example
     ''' </summary>
 	''' \file VB6Class.cls
-	''' \remarks The original unfiltered source of this file: <A HREF="http://trac.sevo.org/projects/doxyvb/browser/trunk/samples/ClassicVB/VB6Class.cls">VB6Class.cls</A>
+	''' \remarks The original unfiltered source of this file: <A HREF="https://github.com/sevoku/doxygen-vb-filter/blob/master/samples/ClassicVB/VB6Class.cls">VB6Class.cls</A>
     
     Private someInteger As Integer ' simple private integer value
     Public someString As String    ' simple public string value
