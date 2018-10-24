@@ -20,40 +20,40 @@ Attribute VB_Exposed = False
     Private someInteger As Integer ' simple private integer value
     Public someString As String    ' simple public string value
     Private someObject As Object   ' some object
-
+    
     ''' <summary>
     ''' simple property
     ''' </summary>
     ''' <value>some string</value>
     ''' <returns>some string</returns>
     Public Property Let StringProperty(value As String)
-            someString = value
+        someString = value
     End Property
     Public Property Get StringProperty() As String
-            StringProperty = someString
+        StringProperty = someString
     End Property
-
+    
     ''' <summary>
     ''' readonly property
     ''' </summary>
     ''' <value>integer value</value>
     ''' <returns>some interger value</returns>
     Public Property Get IntegerProperty() As Integer
-            IntegerProperty = someInteger
+        IntegerProperty = someInteger
     End Property
-
+    
     ''' <summary>
     ''' reference property
     ''' </summary>
     ''' <value>some object</value>
     ''' <returns>some object</returns>
     Public Property Set ObjectProperty(value As Object)
-            Set someObject = value
+        Set someObject = value
     End Property
     Public Property Get ObjectProperty() As Object
-            ObjectProperty = someObject
+        ObjectProperty = someObject
     End Property
-
+    
     ''' <summary>
     ''' not working property
     ''' </summary>
@@ -62,12 +62,12 @@ Attribute VB_Exposed = False
     ''' because Set does not preceed get!
     ''' </remarks>
     Public Property Get TestProperty() As Object
-            ObjectProperty = someObject
+        ObjectProperty = someObject
     End Property
     Public Property Set TestProperty(value As Object)
-            Set someObject = value
+        Set someObject = value
     End Property
-
+    
     ''' <summary>
     ''' function with parameter
     ''' </summary>
@@ -77,7 +77,7 @@ Attribute VB_Exposed = False
     Public Function SampleFunction(ByVal pFirst As Double) As Double
         SampleFunction = pFirst
     End Function
-	
+    
     ''' <summary>
     ''' function with an array as parameter
     ''' </summary>
@@ -86,9 +86,9 @@ Attribute VB_Exposed = False
     ''' <returns>some long value</returns>
     ''' <remarks></remarks>
 	Public Function SampleFunction2(arg1 As Long, arg2() As String) As Long
-
+        
     End Function
-	
+    
     ''' <summary>
     ''' function with an array as result
     ''' </summary>
@@ -96,17 +96,17 @@ Attribute VB_Exposed = False
     ''' <returns>long array</returns>
     ''' <remarks></remarks>
 	Public Function SampleFunction3(arg1 As Long) As Long()
-
+        
     End Function
-	
+    
     ''' <summary>
     ''' simple method
     ''' </summary>
     ''' <remarks></remarks>
     Sub SampleMethod()
-    
+        
     End Sub
-
+    
     ''' <summary>
     ''' method with parameters
     ''' </summary>
@@ -114,19 +114,17 @@ Attribute VB_Exposed = False
     ''' <param name="pPointer">pointer</param>
     ''' <remarks></remarks>
     Public Sub SampleMethodWithParams(ByVal pFirst As String, ByRef pPointer As Integer)
-
+        
     End Sub
     
     ''' <summary>
     ''' simple constructor
     ''' </summary>
-    ''' <param name="pSomeString">simple param</param>
     ''' <remarks></remarks>
-    Private Sub Class_Initialize(ByVal pSomeString As String)
-        someString = pSomeString
+    Private Sub Class_Initialize()
+        
     End Sub
-
-
+    
     ''' <summary>
     ''' some event
     ''' </summary>
@@ -144,6 +142,5 @@ Attribute VB_Exposed = False
     ''' </summary>
     ''' <remarks>Raises Destroy event</remarks>
     Private Sub Class_Terminate()
-       RaiseEvent Destroy
+        RaiseEvent Destroy
     End Sub
-
