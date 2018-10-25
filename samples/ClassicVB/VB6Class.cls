@@ -14,8 +14,8 @@ Attribute VB_Exposed = False
     ''' <summary>
     ''' VB6 class example
     ''' </summary>
-	''' \file VB6Class.cls
-	''' \remarks The original unfiltered source of this file: <A HREF="https://github.com/sevoku/doxygen-vb-filter/blob/master/samples/ClassicVB/VB6Class.cls">VB6Class.cls</A>
+    ''' \file VB6Class.cls
+    ''' \remarks The original unfiltered source of this file: <A HREF="https://github.com/sevoku/doxygen-vb-filter/blob/master/samples/ClassicVB/VB6Class.cls">VB6Class.cls</A>
     
     Private someInteger As Integer ' simple private integer value
     Public someString As String    ' simple public string value
@@ -85,7 +85,7 @@ Attribute VB_Exposed = False
     ''' <param name="arg2">String array</param>
     ''' <returns>some long value</returns>
     ''' <remarks></remarks>
-	Public Function SampleFunction2(arg1 As Long, arg2() As String) As Long
+    Public Function SampleFunction2(arg1 As Long, arg2() As String) As Long
         
     End Function
     
@@ -95,7 +95,7 @@ Attribute VB_Exposed = False
     ''' <param name="arg1">simple long parameter</param>
     ''' <returns>long array</returns>
     ''' <remarks></remarks>
-	Public Function SampleFunction3(arg1 As Long) As Long()
+    Public Function SampleFunction3(arg1 As Long) As Long()
         
     End Function
     
