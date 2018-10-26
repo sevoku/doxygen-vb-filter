@@ -138,7 +138,9 @@ Attribute VB_Exposed = False
     ''' <param name="pPointer">pointer</param>
     ''' <remarks></remarks>
     Public Sub SampleMethodWithParams(ByVal pFirst As String, ByRef pPointer As Integer)
-        
+        Dim d As Long
+        d = 2
+        If d = 2 Then Exit Sub Else d = 3
     End Sub
     
     ''' <summary>
