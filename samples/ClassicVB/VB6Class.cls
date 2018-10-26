@@ -146,7 +146,8 @@ Attribute VB_Exposed = False
     ''' </summary>
     ''' <remarks></remarks>
     Private Sub Class_Initialize()
-        
+        Dim s As String
+        s = "This is a Function as example"
     End Sub
     
     ''' <summary>
