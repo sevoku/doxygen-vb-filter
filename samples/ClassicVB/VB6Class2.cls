@@ -17,12 +17,12 @@ Attribute VB_Exposed = False
     ''' \file VB6Class2.cls
     ''' \remarks The original unfiltered source of this file: <A HREF="https://github.com/sevoku/doxygen-vb-filter/blob/master/samples/ClassicVB/VB6Class2.cls">VB6Class2.cls</A>
     
-    Private Type SampleType1 'Comment
+    Private Type SampleType1
         typeItem1 As Long
         typeItem2 As Long
     End Type
     
-    Private Enum SampleEnum 'Comment
+    Private Enum SampleEnum
         [_First] = 1
         enumItem1 = 1
         enumItem2 = 2
