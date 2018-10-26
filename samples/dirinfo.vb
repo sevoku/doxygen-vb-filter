@@ -13,7 +13,7 @@
 '
 ' \author Vsevolod Kukol
 ' \version 2.4.1
-' \date    03.02.2015
+' \date    09.010.2011
 '
 ' \dir samples contains example files demonstrating the Doxygen VB filter functionality
 ' \package DotNET <summary>contains example classes demonstrating VB.NET filter functionality</summary>
