@@ -1,4 +1,6 @@
 Attribute VB_Name = "VB6Module"
+Option Explicit
+Option Base 0
 ' <summary>VB6 Module Example</summary>
 ' <remarks>The original unfiltered source of this file: <A HREF="http://trac.sevo.org/projects/doxyvb/browser/trunk/samples/ClassicVB/VB6Module.bas">VB6Module.bas</A></remarks>
 
@@ -19,8 +21,7 @@ Public gl_test As Double
 Private Enum SampleEnum
     [_First] = 1
     First_Item = 1 'First enum item
-    ''' Second emum item
-    Second_Item = 2
+    Second_Item = 2 'Second emum item
     Third_Item = 3
     ''' Fourth enum item
     Fourth_Item = 4
@@ -35,7 +36,7 @@ Public Structure SampleVB6Structure
     Private someInteger As Integer
     ''' simple public string value
     Public someString As String
-    Public someLong As Long
+    Public someLong As Long ' simple public long value
 End Structure
 
 ' <summary>

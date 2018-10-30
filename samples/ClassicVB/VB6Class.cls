@@ -11,40 +11,34 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
+Option Base 0
     ''' <summary>
     ''' VB6 class example
     ''' </summary>
     ''' \file VB6Class.cls
     ''' \remarks The original unfiltered source of this file: <A HREF="https://github.com/sevoku/doxygen-vb-filter/blob/master/samples/ClassicVB/VB6Class.cls">VB6Class.cls</A>
     
-Private Declare Function WritePrivateProfileStringA Lib "kernel32" ( _
-    ByVal strSection As String, _
-    ByVal strKey As String, _
-    ByVal strString As String, _
-    ByVal strFileNameName As String) As Long
-    
+    '''
+    Private Declare Function WritePrivateProfileStringA Lib "kernel32" ( _
+        ByVal strSection As String, _
+        ByVal strKey As String, _
+        ByVal strString As String, _
+        ByVal strFileNameName As String) As Long
+        
+    '''
     Private Enum SampleEnum
-        [_First] = 1
-        enumItem1 = 1
-        enumItem2 = 2
-        enumItem3 = 3
-        [_Last] = 3
+        [_First] = 0
+        enumItem1 = 0
+        enumItem2 = 1
+        enumItem3 = 2
+        [_Last] = 2
     End Enum
     
-    Private Type SampleType1
+    '''
+    Private Type SampleType
         typeItem1 As Long
-        typeItem2 As Long
-    End Type
-    
-    ''' Sample private type within a class
-    Private Type SampleType2
-        typeItem1 As Long
-        typeItem2 As Long
-    End Type
-    
-    Private Type SampleType3
-        typeItem1 As Long
-        typeItem2 As Long
+        typeItem2 As Double
     End Type
     
     Private someInteger As Integer ' simple private integer value
@@ -64,10 +58,10 @@ Private Declare Function WritePrivateProfileStringA Lib "kernel32" ( _
     End Property
     
     ''' <summary>
-    ''' readonly property
+    ''' read-only property
     ''' </summary>
     ''' <value>integer value</value>
-    ''' <returns>some interger value</returns>
+    ''' <returns>some integer value</returns>
     Public Property Get IntegerProperty() As Integer
         IntegerProperty = someInteger
     End Property
@@ -88,8 +82,8 @@ Private Declare Function WritePrivateProfileStringA Lib "kernel32" ( _
     ''' not working property
     ''' </summary>
     ''' <remarks>
-    ''' this property will be seen as ReadOnly by the Doxygen vbfilter
-    ''' because Set does not preceed get!
+    ''' this property will be seen as read-only by the Doxygen vbfilter
+    ''' because Set does not precede get!
     ''' </remarks>
     Public Property Get TestProperty() As Object
         ObjectProperty = someObject
@@ -115,8 +109,8 @@ Private Declare Function WritePrivateProfileStringA Lib "kernel32" ( _
     ''' <param name="arg2">String array</param>
     ''' <returns>some long value</returns>
     ''' <remarks></remarks>
-    Public Function SampleFunction2(arg1 As Long, arg2() As String) As Long
-        
+    Public Function SampleFunction2(ByVal arg1 As Long, ByRef arg2() As String) As Long
+        SampleFunction2 = arg1
     End Function
     
     ''' <summary>
@@ -126,7 +120,6 @@ Private Declare Function WritePrivateProfileStringA Lib "kernel32" ( _
     ''' <returns>long array</returns>
     ''' <remarks></remarks>
     Public Function SampleFunction3(arg1 As Long) As Long()
-        
     End Function
     
     ''' <summary>
@@ -134,7 +127,6 @@ Private Declare Function WritePrivateProfileStringA Lib "kernel32" ( _
     ''' </summary>
     ''' <remarks></remarks>
     Sub SampleMethod()
-        
     End Sub
     
     ''' <summary>
@@ -144,9 +136,6 @@ Private Declare Function WritePrivateProfileStringA Lib "kernel32" ( _
     ''' <param name="pPointer">pointer</param>
     ''' <remarks></remarks>
     Public Sub SampleMethodWithParams(ByVal pFirst As String, ByRef pPointer As Integer)
-        Dim d As Long
-        d = 2
-        If d = 2 Then Exit Sub Else d = 3
     End Sub
     
     ''' <summary>
@@ -154,8 +143,6 @@ Private Declare Function WritePrivateProfileStringA Lib "kernel32" ( _
     ''' </summary>
     ''' <remarks></remarks>
     Private Sub Class_Initialize()
-        Dim s As String
-        s = "This is a Function as example"
     End Sub
     
     ''' <summary>
