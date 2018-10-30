@@ -2,12 +2,12 @@ Attribute VB_Name = "VB6Module"
 ' <summary>VB6 Module Example</summary>
 ' <remarks>The original unfiltered source of this file: <A HREF="http://trac.sevo.org/projects/doxyvb/browser/trunk/samples/ClassicVB/VB6Module.bas">VB6Module.bas</A></remarks>
 
-Public Declare Function GetTickCount Lib "kernel32.dll" () As Long
-
-Public Declare Function WritePrivateProfileStringA Lib "kernel32" ( _
+Public Declare Function GetPrivateProfileStringA Lib "kernel32" ( _
     ByVal strSection As String, _
     ByVal strKey As String, _
-    ByVal strString As String, _
+    ByVal strDefault As String, _
+    ByVal strReturnedString As String, _
+    ByVal lngSize As Long, _
     ByVal strFileNameName As String) As Long
 
 ''' Global variable example
